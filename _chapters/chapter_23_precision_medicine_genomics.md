@@ -39,17 +39,13 @@ The T-learner addresses this by building separate models $$ \mu_0(x) $$ and $$ \
 
 For more robust estimation, doubly robust methods combine outcome modeling with propensity score weighting. The augmented inverse propensity weighted (AIPW) estimator for the CATE is given by
 
-$$
-\hat{\tau}(x) = \mathbb{E}\left[\frac{T_i(Y_i - \hat{\mu}_1(X_i))}{\hat{e}(X_i)} - \frac{(1-T_i)(Y_i - \hat{\mu}_0(X_i))}{1-\hat{e}(X_i)} + \hat{\mu}_1(X_i) - \hat{\mu}_0(X_i) \Big\mid X_i = x\right]
-$$
+$$\hat{\tau}(x) = \mathbb{E}\left[\frac{T_i(Y_i - \hat{\mu}_1(X_i))}{\hat{e}(X_i)} - \frac{(1-T_i)(Y_i - \hat{\mu}_0(X_i))}{1-\hat{e}(X_i)} + \hat{\mu}_1(X_i) - \hat{\mu}_0(X_i) \Big\mid X_i = x\right]$$
 
 where $$ \hat{e}(x) = P(T=1\mid X=x) $$ is the estimated propensity score. This estimator is consistent if either the outcome models or the propensity model is correctly specified, providing protection against model misspecification. In practice, we use flexible machine learning methods for both $$ \hat{\mu}_t(x) $$ and $$ \hat{e}(x) $$, combining them through cross-fitting to avoid overfitting bias.
 
 Causal forests extend random forests to estimate CATEs by modifying the splitting criterion to maximize treatment effect heterogeneity. Each tree is built by randomly subsampling the data and features, then recursively partitioning to maximize the difference in treatment effects across resulting nodes. For a given leaf $$ L(x) $$ containing patient $$ i $$, the treatment effect estimate equals
 
-$$
-\hat{\tau}(x) = \frac{\sum_{i: X_i \in L(x)} T_i Y_i}{\sum_{i: X_i \in L(x)} T_i} - \frac{\sum_{i: X_i \in L(x)} (1-T_i) Y_i}{\sum_{i: X_i \in L(x)} (1-T_i)}
-$$
+$$\hat{\tau}(x) = \frac{\sum_{i: X_i \in L(x)} T_i Y_i}{\sum_{i: X_i \in L(x)} T_i} - \frac{\sum_{i: X_i \in L(x)} (1-T_i) Y_i}{\sum_{i: X_i \in L(x)} (1-T_i)}$$
 
 Honest causal forests improve upon this by using a sample splitting approach where one subset of data is used to determine the tree structure and another independent subset is used to estimate treatment effects within leaves, reducing overfitting. The resulting estimates have desirable theoretical properties including consistency and asymptotic normality under regularity conditions.
 
@@ -59,15 +55,11 @@ For treatment recommendations, we must account for uncertainty in CATE estimates
 
 Effective treatment recommendations must incorporate patient preferences and values, which often vary across populations and cultures. Utility theory provides a mathematical framework for quantifying how patients value different health outcomes. For patient $$ i $$ with covariates $$ X_i $$, we define a utility function $$ U_i(h) $$ that maps health states $$ h $$ to real numbers representing preference. Under treatment $$ t $$, patient $$ i $$ experiences outcome $$ Y_i(t) $$ with associated health state $$ h_i(t) $$. The optimal treatment maximizes expected utility, given by
 
-$$
-t^{\star} = \arg\max_{t \in \mathcal{T}} \mathbb{E}[U_i(h_i(t)) \mid X_i]
-$$
+$$t^{\star} = \arg\max_{t \in \mathcal{T}} \mathbb{E}[U_i(h_i(t)) \mid X_i]$$
 
 In clinical contexts, health states are typically multidimensional, encompassing survival, quality of life, symptom burden, functional status, and treatment side effects. Quality-adjusted life years (QALYs) provide one approach to aggregate these dimensions, defining $$ U_i(h) = L_i \cdot Q_i $$ where $$ L_i $$ is life years and $$ Q_i \in [0,1] $$ is quality of life. However, the QALY framework embeds assumptions about temporal additivity and constant proportional trade-offs that may not reflect individual preferences. More flexible approaches use multi-attribute utility functions of the form
 
-$$
-U_i(h) = \sum_{j=1}^J w_{ij} u_{ij}(h_j)
-$$
+$$U_i(h) = \sum_{j=1}^J w_{ij} u_{ij}(h_j)$$
 
 where $$ h_j $$ are attributes such as mobility, pain, cognitive function, and $$ w_{ij} $$ are patient-specific weights reflecting the relative importance of each attribute. Eliciting these weights requires careful preference assessment through methods such as time trade-off tasks, standard gambles, or discrete choice experiments.
 
@@ -75,9 +67,7 @@ Crucially, preferences vary systematically across populations. Research has docu
 
 To model preference heterogeneity, we can estimate conditional utility functions $$ U(h; x, p) $$ where $$ x $$ represents clinical characteristics and $$ p $$ represents patient-reported preferences. One approach uses mixed logit models to estimate preference distributions of the form
 
-$$
-P(y_i = t \mid x_i, p_i) = \frac{\exp(\beta_t^T f(x_i, p_i))}{\sum_{t' \in \mathcal{T}} \exp(\beta_{t'}^T f(x_i, p_i))}
-$$
+$$P(y_i = t \mid x_i, p_i) = \frac{\exp(\beta_t^T f(x_i, p_i))}{\sum_{t' \in \mathcal{T}} \exp(\beta_{t'}^T f(x_i, p_i))}$$
 
 where $$ f(x_i, p_i) $$ combines clinical features with preference indicators and $$ \beta_t $$ captures how different attributes influence treatment choice. By allowing coefficients to vary across individuals, we capture heterogeneous preferences while still estimating population-level preference distributions.
 
@@ -100,21 +90,15 @@ The constraint-based approach instead treats some objectives as hard constraints
 
 From an equity perspective, several optimization formulations explicitly promote fairness. The maximin approach seeks to maximize the minimum outcome across groups, yielding
 
-$$
-t^{\star} = \arg\max_t \min_{g \in \mathcal{G}} \mathbb{E}[Y_i(t) \mid G_i = g, X_i]
-$$
+$$t^{\star} = \arg\max_t \min_{g \in \mathcal{G}} \mathbb{E}[Y_i(t) \mid G_i = g, X_i]$$
 
 This prioritizes improvements for the worst-off group but may sacrifice overall efficacy. The Nash social welfare approach instead maximizes the product of group outcomes, expressed as
 
-$$
-t^{\star} = \arg\max_t \prod_{g \in \mathcal{G}} \mathbb{E}[Y_i(t) \mid G_i = g, X_i]
-$$
+$$t^{\star} = \arg\max_t \prod_{g \in \mathcal{G}} \mathbb{E}[Y_i(t) \mid G_i = g, X_i]$$
 
 providing a balance between efficiency and equity. Disparate impact constraints require that treatment effects do not differ substantially across groups, enforcing
 
-$$
-\frac{\mathbb{E}[Y_i(t) \mid G_i = g_1, X_i]}{\mathbb{E}[Y_i(t) \mid G_i = g_2, X_i]} \geq 1 - \delta
-$$
+$$\frac{\mathbb{E}[Y_i(t) \mid G_i = g_1, X_i]}{\mathbb{E}[Y_i(t) \mid G_i = g_2, X_i]} \geq 1 - \delta$$
 
 for all pairs of groups $$ (g_1, g_2) $$ and some tolerance $$ \delta $$. These constraints ensure that recommendations do not exacerbate existing disparities.
 
@@ -128,37 +112,27 @@ Precision dosing represents a critical application of treatment recommendation s
 
 The standard pharmacokinetic model describes drug concentration $$ C(t) $$ over time following a dose $$ D $$ using compartmental models. A one-compartment model with first-order elimination is
 
-$$
-C(t) = \frac{D}{V} e^{-k_e t}
-$$
+$$C(t) = \frac{D}{V} e^{-k_e t}$$
 
 where $$ V $$ is volume of distribution and $$ k_e $$ is elimination rate constant. Multi-compartment models extend this to describe distribution across tissue compartments. Population pharmacokinetic models allow parameters to vary across individuals according to
 
-$$
-\theta_i = \theta_{\text{pop}} \cdot e^{\eta_i}
-$$
+$$\theta_i = \theta_{\text{pop}} \cdot e^{\eta_i}$$
 
 where $$ \theta_i $$ is an individual parameter (e.g., clearance), $$ \theta_{\text{pop}} $$ is the population mean, and $$ \eta_i \sim N(0, \omega^2) $$ captures between-subject variability. Covariates such as age, weight, renal function, and genetic polymorphisms can be incorporated through
 
-$$
-\theta_i = \theta_{\text{pop}} \cdot \prod_{j} \left(\frac{X_{ij}}{X_{\text{ref},j}}\right)^{\beta_j} \cdot e^{\eta_i}
-$$
+$$\theta_i = \theta_{\text{pop}} \cdot \prod_{j} \left(\frac{X_{ij}}{X_{\text{ref},j}}\right)^{\beta_j} \cdot e^{\eta_i}$$
 
 allowing dose adjustment based on patient characteristics. For example, for drugs cleared renally, clearance scales with creatinine clearance: $$ CL_i = CL_{\text{pop}} \cdot (CrCl_i/CrCl_{\text{ref}})^{0.75} $$.
 
 Pharmacodynamic models link concentration to effect. The sigmoid Emax model describes how concentration $$ C $$ produces effect $$ E $$ via
 
-$$
-E(C) = E_0 + \frac{E_{\max} \cdot C^\gamma}{EC_{50}^\gamma + C^\gamma}
-$$
+$$E(C) = E_0 + \frac{E_{\max} \cdot C^\gamma}{EC_{50}^\gamma + C^\gamma}$$
 
 where $$ E_0 $$ is baseline effect, $$ E_{\max} $$ is maximum effect, $$ EC_{50} $$ is concentration producing half-maximal effect, and $$ \gamma $$ is Hill coefficient describing sigmoidicity. For many drugs, toxicity also increases with concentration, creating a therapeutic window between minimum effective concentration and maximum safe concentration.
 
 To recommend optimal doses, we use model predictive control which repeatedly solves the optimization problem
 
-$$
-\max_{d_1, \ldots, d_T} \sum_{t=1}^T U(E(C_t), A(C_t))
-$$
+$$\max_{d_1, \ldots, d_T} \sum_{t=1}^T U(E(C_t), A(C_t))$$
 
 subject to pharmacokinetic model constraints linking doses $$ d_t $$ to concentrations $$ C_t $$, where $$ U(E,A) $$ is a utility function reflecting the benefit of therapeutic effect $$ E $$ and harm of adverse effects $$ A $$. This is solved at each time point using the current measured concentration and patient state, implementing only the first dose and then re-optimizing at the next time point once new measurements are available.
 
@@ -172,31 +146,23 @@ Treatment selection systems recommend which among multiple treatment options is 
 
 For single treatment selection, we estimate the CATE for each available treatment $$ \tau_t(x) = \mathbb{E}[Y_i(t) - Y_i(0) \mid X_i=x] $$ and recommend
 
-$$
-t^{\star}(x) = \arg\max_{t \in \mathcal{T}} \hat{\tau}_t(x)
-$$
+$$t^{\star}(x) = \arg\max_{t \in \mathcal{T}} \hat{\tau}_t(x)$$
 
 However, this greedy approach ignores uncertainty in CATE estimates. A more robust approach uses Thompson sampling where we randomly sample from the posterior distribution of treatment effects and recommend the treatment with the highest sampled effect, namely
 
-$$
-t^{\star}(x) \sim P(t = \arg\max_{t'} \tilde{\tau}_{t'}(x))
-$$
+$$t^{\star}(x) \sim P(t = \arg\max_{t'} \tilde{\tau}_{t'}(x))$$
 
 where $$ \tilde{\tau}_t(x) \sim P(\tau_t(x) \mid \mathcal{D}) $$ is sampled from the posterior given data $$ \mathcal{D} $$. This naturally incorporates exploration: treatments with uncertain effects have higher probability of being recommended, allowing the system to learn from experience.
 
 For treatment combinations, we must consider interactions between therapies. Let $$ t = (t_1, \ldots, t_J) $$ be a vector indicating which treatments are administered. The outcome with combination treatment may exhibit synergistic effects described by
 
-$$
-Y_i(\mathbf{t}) = \mu_0(X_i) + \sum_{j=1}^{J} \tau_j(X_i)\, t_j + \sum_{1 \le j < k \le J} \tau_{jk}(X_i)\, t_j t_k + \cdots
-$$
+$$Y_i(\mathbf{t}) = \mu_0(X_i) + \sum_{j=1}^{J} \tau_j(X_i)\, t_j + \sum_{1 \le j < k \le J} \tau_{jk}(X_i)\, t_j t_k + \cdots$$
 
 where $$ \tau_j(X_i) $$ are main effects and $$ \tau_{jk}(X_i) $$ are pairwise interaction effects. Estimating higher-order interactions requires substantial sample sizes. In practice, we often assume limited interactions and use regularization to select sparse models.
 
 An alternative approach uses reinforcement learning to learn optimal treatment policies through sequential decision-making. We model treatment selection as a contextual bandit problem where at each decision point we observe patient state $$ X_i $$, choose action (treatment) $$ A_i $$, and observe reward $$ R_i $$. The goal is to learn a policy $$ \pi(a\mid x) $$ that maximizes expected reward $$ \mathbb{E}_{x,a \sim \pi}[R(x,a)] $$. Contextual bandit algorithms such as LinUCB maintain uncertainty estimates for each action and select actions optimistically according to
 
-$$
-a^*(x) = \arg\max_a \left[\hat{Q}(x,a) + \beta \sqrt{\text{Var}[\hat{Q}(x,a)]}\right]
-$$
+$$a^*(x) = \arg\max_a \left[\hat{Q}(x,a) + \beta \sqrt{\text{Var}[\hat{Q}(x,a)]}\right]$$
 
 where $$ \hat{Q}(x,a) $$ is the estimated expected reward and $$ \beta $$ controls exploration. This UCB approach has theoretical guarantees on regret bounds and naturally handles the exploration-exploitation trade-off.
 
@@ -215,17 +181,13 @@ Clinical pathways are structured multidisciplinary care plans that specify the s
 
 We model a clinical pathway as a finite-horizon Markov decision process where patient state $$ S_t $$ evolves over discrete time steps, actions $$ A_t $$ represent clinical interventions, and the transition dynamics $$ P(S_{t+1}\mid S_t, A_t) $$ describe disease progression and treatment response. The reward function $$ R(S_t, A_t) $$ captures both intermediate outcomes (symptom relief, functional improvement) and terminal outcomes (survival, quality of life). The optimal policy $$ \pi^{\star}(s) = \arg\max_a Q^{\star}(s,a) $$ maximizes expected cumulative reward defined by
 
-$$
-Q^{\star}(s,a) = \mathbb{E}\left[\sum_{t=0}^T \gamma^t R(S_t, A_t) \Big\mid S_0=s, A_0=a, \pi^{\star}\right]
-$$
+$$Q^{\star}(s,a) = \mathbb{E}\left[\sum_{t=0}^T \gamma^t R(S_t, A_t) \Big\mid S_0=s, A_0=a, \pi^{\star}\right]$$
 
 where $$ \gamma \in [0,1] $$ is a discount factor reflecting the relative value of immediate versus future rewards.
 
 For pathways with moderate state and action spaces, we can solve for optimal policies using dynamic programming methods including value iteration or policy iteration. For complex pathways with high-dimensional state spaces, we use reinforcement learning with function approximation. Fitted Q-iteration builds a sequence of Q-functions specified by
 
-$$
-\hat{Q}_{k+1}(s,a) = r(s,a) + \gamma \max_{a'} \hat{Q}_k(s', a')
-$$
+$$\hat{Q}_{k+1}(s,a) = r(s,a) + \gamma \max_{a'} \hat{Q}_k(s', a')$$
 
 estimated using supervised learning on transition data $$ (s, a, r, s') $$. Deep Q-networks use neural networks to approximate $$ Q^{\star}(s,a) $$, enabling application to high-dimensional state representations.
 
@@ -235,21 +197,15 @@ To incorporate these constraints, we extend the MDP formulation to include resou
 
 Equity-focused pathway optimization explicitly considers disparities in access and outcomes. We can formulate this as constrained optimization
 
-$$
-\max_\pi \mathbb{E}_{s,a \sim \pi}[Q^\pi(s,a)]
-$$
+$$\max_\pi \mathbb{E}_{s,a \sim \pi}[Q^\pi(s,a)]$$
 
 subject to the constraints
 
-$$
-\min_{g \in \mathcal{G}} \mathbb{E}_{s,a \sim \pi \mid G=g}[Q^\pi(s,a)] \geq \theta
-$$
+$$\min_{g \in \mathcal{G}} \mathbb{E}_{s,a \sim \pi \mid G=g}[Q^\pi(s,a)] \geq \theta$$
 
 ensuring that expected outcomes for all groups exceed a minimum threshold $$ \theta $$. Alternatively, we can incorporate equity directly into the reward function via
 
-$$
-R_{\text{equity}}(s,a) = R(s,a) - \lambda \cdot \text{Var}_g[\mathbb{E}[Q^\pi(s,a) \mid G=g]]
-$$
+$$R_{\text{equity}}(s,a) = R(s,a) - \lambda \cdot \text{Var}_g[\mathbb{E}[Q^\pi(s,a) \mid G=g]]$$
 
 penalizing policies that produce disparate outcomes across groups. This formulation incentivizes identifying pathways that work well across diverse care settings and patient circumstances.
 
@@ -259,9 +215,7 @@ Shared decision making (SDM) is an approach to clinical consultation where clini
 
 Preference elicitation methods vary in cognitive demand and information requirements. Discrete choice experiments present patients with choice sets of treatment profiles defined by multiple attributes (efficacy, side effects, administration burden, cost). For two treatment options described by attributes $$ x_1 $$ and $$ x_2 $$, the probability patient $$ i $$ chooses option 1 is modeled as
 
-$$
-P(y_i = 1) = \frac{\exp(\beta_i^T x_1)}{\exp(\beta_i^T x_1) + \exp(\beta_i^T x_2)}
-$$
+$$P(y_i = 1) = \frac{\exp(\beta_i^T x_1)}{\exp(\beta_i^T x_1) + \exp(\beta_i^T x_2)}$$
 
 where $$ \beta_i $$ represents individual-specific preference weights. By presenting multiple choice tasks with systematically varied attribute levels, we can estimate $$ \beta_i $$ and predict preferred treatment. Time trade-off (TTO) methods ask patients how many years of life in a disease state they would trade for fewer years in full health, quantifying quality-of-life weights. Standard gambles ask patients what mortality risk they would accept for a treatment that could restore full health, eliciting risk preferences.
 
@@ -277,51 +231,37 @@ To ensure treatment recommendation systems promote rather than undermine health 
 
 Demographic parity requires that treatment recommendations are independent of protected attributes, imposing
 
-$$
-P(T=1\mid G=g_1) = P(T=1 \mid G=g_2)
-$$
+$$P(T=1\mid G=g_1) = P(T=1 \mid G=g_2)$$
 
 for all groups $$ g_1, g_2 $$. This ensures equal treatment rates but may be inappropriate if treatment needs genuinely differ across populations. Equalized odds requires that, conditional on the outcome, recommendations are independent of group membership, meaning
 
-$$
-P(T=1\mid Y=y, G=g_1) = P(T=1 \mid Y=y, G=g_2)
-$$
+$$P(T=1\mid Y=y, G=g_1) = P(T=1 \mid Y=y, G=g_2)$$
 
 This allows recommendation rates to differ across groups if base rates differ, but requires equal true positive and false positive rates. Predictive parity requires that the positive predictive value of recommendations is equal across groups, captured by
 
-$$
-P(Y=1\mid T=1, G=g_1) = P(Y=1 \mid T=1, G=g_2)
-$$
+$$P(Y=1\mid T=1, G=g_1) = P(Y=1 \mid T=1, G=g_2)$$
 
 ensuring that a recommendation means the same thing for all groups.
 
 For treatment recommendations specifically, we should focus on outcome fairness by asking whether recommended treatments lead to equitable outcomes. This requires that expected outcomes conditional on covariates are similar across groups, so that
 
-$$
-\mathbb{E}[Y_i(t^{\star}(X_i)) \mid X_i, G_i=g_1] \approx \mathbb{E}[Y_i(t^{\star}(X_i)) \mid X_i, G_i=g_2]
-$$
+$$\mathbb{E}[Y_i(t^{\star}(X_i)) \mid X_i, G_i=g_1] \approx \mathbb{E}[Y_i(t^{\star}(X_i)) \mid X_i, G_i=g_2]$$
 
 for recommended treatments $$ t^{\star}(X_i) $$. Note that this differs from requiring equal outcomes unconditionally, which would ignore that patients present with different clinical needs. Instead, we require that among patients with similar clinical presentations, recommended treatments lead to similar expected benefits regardless of group membership.
 
 Calibration within groups is also critical. A recommendation system is calibrated if the predicted benefit of treatment matches the realized benefit, i.e.
 
-$$
-\mathbb{E}[Y_i(t) - Y_i(0) \mid \hat{\tau}(X_i) = \tau, G_i=g] = \tau
-$$
+$$\mathbb{E}[Y_i(t) - Y_i(0) \mid \hat{\tau}(X_i) = \tau, G_i=g] = \tau$$
 
 for all groups $$ g $$. Poor calibration can lead to over-treatment or under-treatment of specific populations. We should validate calibration separately within each demographic subgroup and clinical population of interest.
 
 To implement fairness constraints, we can modify the optimization objective when learning recommendation policies. For example, to satisfy equalized odds constraints in a treatment recommendation setting, we add Lagrange multipliers so that
 
-$$
-\mathcal{L}(\pi, \lambda) = -\mathbb{E}[Y_i(t^\pi(X_i))] + \sum_{g,y} \lambda_{g,y} \lvert P(T=1 \mid Y=y,G=g) - P(T=1\mid Y=y) \rvert
-$$
+$$\mathcal{L}(\pi, \lambda) = -\mathbb{E}[Y_i(t^\pi(X_i))] + \sum_{g,y} \lambda_{g,y} \lvert P(T=1 \mid Y=y,G=g) - P(T=1\mid Y=y) \rvert$$
 
 and solve
 
-$$
-\max_\pi \min_\lambda \mathcal{L}(\pi, \lambda)
-$$
+$$\max_\pi \min_\lambda \mathcal{L}(\pi, \lambda)$$
 
 The resulting policy balances outcome maximization with fairness constraints. Fair representation learning provides an alternative approach: learn representations $$ Z_i = h(X_i) $$ that are predictive of outcomes but statistically independent of sensitive attributes $$ G_i $$. Treatment recommendations based on $$ Z_i $$ cannot encode information about group membership beyond what is predictively relevant for outcomes.
 
