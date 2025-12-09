@@ -33,21 +33,21 @@ This chapter develops the mathematical foundations and practical implementations
 
 ## Mathematical Foundations of Multimodal Learning
 
-Consider a clinical prediction task where we have access to $M $ different modalities. For a given patient $ i $, we observe data $\mathbf{x}_i = \{\mathbf{x}_i^{(1)}, \mathbf{x}_i^{(2)}, \ldots, \mathbf{x}_i^{(M)}\}$ where $\mathbf{x}_i^{(m)}$ represents the data from modality $m$. Each modality lives in its own space: $\mathbf{x}_i^{(m)} \in \mathcal{X}^{(m)}$. For instance, in a clinical setting we might have imaging data $\mathbf{x}_i^{(1)} \in \mathbb{R}^{H \times W \times C}$ (a chest radiograph), clinical notes $\mathbf{x}_i^{(2)} \in \mathcal{V}^{L}$ (a sequence of tokens from vocabulary $\mathcal{V}$ of length $L$), and structured EHR data $\mathbf{x}_i^{(3)} \in \mathbb{R}^{D}$ (laboratory values and vital signs).
+Consider a clinical prediction task where we have access to $$M $$ different modalities. For a given patient $$ i $$, we observe data $$\mathbf{x}_i = \{\mathbf{x}_i^{(1)}, \mathbf{x}_i^{(2)}, \ldots, \mathbf{x}_i^{(M)}\}$$ where $$\mathbf{x}_i^{(m)}$$ represents the data from modality $$m$$. Each modality lives in its own space: $$\mathbf{x}_i^{(m)} \in \mathcal{X}^{(m)}$$. For instance, in a clinical setting we might have imaging data $$\mathbf{x}_i^{(1)} \in \mathbb{R}^{H \times W \times C}$$ (a chest radiograph), clinical notes $$\mathbf{x}_i^{(2)} \in \mathcal{V}^{L}$$ (a sequence of tokens from vocabulary $$\mathcal{V}$$ of length $$L$$), and structured EHR data $$\mathbf{x}_i^{(3)} \in \mathbb{R}^{D}$$ (laboratory values and vital signs).
 
-The goal of multimodal learning is to learn a function $ f: \mathcal{X}^{(1)} \times \mathcal{X}^{(2)} \times \cdots \times \mathcal{X}^{(M)} \rightarrow \mathcal{Y}$ that maps from the joint space of all modalities to an output space $\mathcal{Y}$, such as disease diagnosis or mortality risk. The key challenge is that the modalities are heterogeneous: they have different dimensionalities, statistical properties, and semantic content.
+The goal of multimodal learning is to learn a function $$ f: \mathcal{X}^{(1)} \times \mathcal{X}^{(2)} \times \cdots \times \mathcal{X}^{(M)} \rightarrow \mathcal{Y}$$ that maps from the joint space of all modalities to an output space $$\mathcal{Y}$$, such as disease diagnosis or mortality risk. The key challenge is that the modalities are heterogeneous: they have different dimensionalities, statistical properties, and semantic content.
 
 ### Modality-Specific Encoders
 
-The first step in multimodal learning is encoding each modality into a common representational space. We define modality-specific encoders $\phi^{(m)}: \mathcal{X}^{(m)} \rightarrow \mathbb{R}^{d}$ that map raw modality data to fixed-dimensional embeddings. These encoders are typically deep neural networks whose architecture is tailored to the structure of each modality. For imaging data, convolutional neural networks extract spatial features. For text, transformer-based language models encode semantic content. For structured data, feedforward networks or graph neural networks (when relationships between features are known) produce embeddings.
+The first step in multimodal learning is encoding each modality into a common representational space. We define modality-specific encoders $$\phi^{(m)}: \mathcal{X}^{(m)} \rightarrow \mathbb{R}^{d}$$ that map raw modality data to fixed-dimensional embeddings. These encoders are typically deep neural networks whose architecture is tailored to the structure of each modality. For imaging data, convolutional neural networks extract spatial features. For text, transformer-based language models encode semantic content. For structured data, feedforward networks or graph neural networks (when relationships between features are known) produce embeddings.
 
-Formally, for each modality $ m$, we compute an embedding:
+Formally, for each modality $$ m$$, we compute an embedding:
 
 $$
 \mathbf{z}_i^{(m)} = \phi^{(m)}(\mathbf{x}_i^{(m)}; \theta^{(m)})
 $$
 
-where $\theta^{(m)}$ are the parameters of the encoder for modality $ m $, and $\mathbf{z}_i^{(m)} \in \mathbb{R}^{d}$ is the resulting embedding. The choice of embedding dimension $d$ involves trade-offs: larger dimensions provide more representational capacity but increase computational cost and risk of overfitting, particularly when training data is limited.
+where $$\theta^{(m)}$$ are the parameters of the encoder for modality $$ m $$, and $$\mathbf{z}_i^{(m)} \in \mathbb{R}^{d}$$ is the resulting embedding. The choice of embedding dimension $$d$$ involves trade-offs: larger dimensions provide more representational capacity but increase computational cost and risk of overfitting, particularly when training data is limited.
 
 ### Fusion Strategies
 
@@ -59,7 +59,7 @@ $$
 \mathbf{h}_i = \psi([\mathbf{x}_i^{(1)}, \mathbf{x}_i^{(2)}, \ldots, \mathbf{x}_i^{(M)}]; \theta_{\text{fusion}})
 $$
 
-where $[\cdot]$ denotes concatenation (or another combining operation), and $\psi$ is a joint model that processes all modalities simultaneously. Early fusion allows the model to learn low-level cross-modal interactions but requires all modalities to be available during training and inference. In clinical settings, this can be problematic as the concatenation of a high-resolution image with a short text note creates imbalanced inputs.
+where $$[\cdot]$$ denotes concatenation (or another combining operation), and $$\psi$$ is a joint model that processes all modalities simultaneously. Early fusion allows the model to learn low-level cross-modal interactions but requires all modalities to be available during training and inference. In clinical settings, this can be problematic as the concatenation of a high-resolution image with a short text note creates imbalanced inputs.
 
 **Late Fusion** processes each modality independently through modality-specific models, then combines their predictions:
 
@@ -75,7 +75,7 @@ $$
 \hat{y}_i = \text{Aggregate}(\{\hat{y}_i^{(1)}, \hat{y}_i^{(2)}, \ldots, \hat{y}_i^{(M)}\})
 $$
 
-where $g^{(m)}$ is a prediction head for modality $ m$, and the aggregation function might be averaging, voting, or a learned weighted combination. Late fusion is robust to missing modalities since each modality produces an independent prediction, but it cannot capture cross-modal interactions that may be clinically important. For instance, a late fusion model cannot learn that certain imaging findings are particularly concerning in the context of specific laboratory abnormalities.
+where $$g^{(m)}$$ is a prediction head for modality $$ m$$, and the aggregation function might be averaging, voting, or a learned weighted combination. Late fusion is robust to missing modalities since each modality produces an independent prediction, but it cannot capture cross-modal interactions that may be clinically important. For instance, a late fusion model cannot learn that certain imaging findings are particularly concerning in the context of specific laboratory abnormalities.
 
 **Intermediate Fusion** strikes a balance by learning modality-specific encoders, then fusing their embeddings to learn joint representations:
 
@@ -95,7 +95,7 @@ This approach allows learning both modality-specific representations and cross-m
 
 ### Attention-Based Fusion
 
-Attention mechanisms have emerged as powerful tools for multimodal fusion, allowing the model to dynamically weight the contribution of each modality based on the input. Given embeddings $\{\mathbf{z}_i^{(1)}, \mathbf{z}_i^{(2)}, \ldots, \mathbf{z}_i^{(M)}\}$, we compute attention weights $\alpha_i^{(m)}$ that indicate the importance of modality $m$ for predicting the outcome of patient $i$:
+Attention mechanisms have emerged as powerful tools for multimodal fusion, allowing the model to dynamically weight the contribution of each modality based on the input. Given embeddings $$\{\mathbf{z}_i^{(1)}, \mathbf{z}_i^{(2)}, \ldots, \mathbf{z}_i^{(M)}\}$$, we compute attention weights $$\alpha_i^{(m)}$$ that indicate the importance of modality $$m$$ for predicting the outcome of patient $$i$$:
 
 $$
 \alpha_i^{(m)} = \frac{\exp(w^{(m)\top} \mathbf{z}_i^{(m)})}{\sum_{m'=1}^{M} \exp(w^{(m')\top} \mathbf{z}_i^{(m')})}
@@ -121,17 +121,17 @@ $$
 \mathbf{h}_i = \mathbf{z}_i^{(1)} + \sum_{m=2}^{M} \alpha_i^{(m)} \mathbf{v}_i^{(m)}
 $$
 
-This formulation, inspired by transformer architectures, allows imaging data (modality 1) to query information from clinical notes (modalities 2 through $M $), creating rich cross-modal representations. The attention weights $\alpha_i^{(m)}$ also provide interpretability, indicating which modalities were most informative for each prediction.
+This formulation, inspired by transformer architectures, allows imaging data (modality 1) to query information from clinical notes (modalities 2 through $$M $$), creating rich cross-modal representations. The attention weights $$\alpha_i^{(m)}$$ also provide interpretability, indicating which modalities were most informative for each prediction.
 
 ### Co-Attention and Transformer-Based Fusion
 
-Co-attention mechanisms extend cross-modal attention by allowing bidirectional information flow between modalities. For two modalities with embeddings $\mathbf{z}_i^{(1)} \in \mathbb{R}^{d_1}$ and $\mathbf{z}_i^{(2)} \in \mathbb{R}^{d_2}$, co-attention computes:
+Co-attention mechanisms extend cross-modal attention by allowing bidirectional information flow between modalities. For two modalities with embeddings $$\mathbf{z}_i^{(1)} \in \mathbb{R}^{d_1}$$ and $$\mathbf{z}_i^{(2)} \in \mathbb{R}^{d_2}$$, co-attention computes:
 
 $$
 \mathbf{C}_i = \tanh(\mathbf{z}_i^{(1)} W_c (\mathbf{z}_i^{(2)})^\top)
 $$
 
-where $\mathbf{C}_i \in \mathbb{R}^{d_1 \times d_2}$ captures pairwise affinities between elements of the two modalities. Attention weights are derived from $\mathbf{C}_i$ to produce modality-specific attended representations that encode information from both modalities.
+where $$\mathbf{C}_i \in \mathbb{R}^{d_1 \times d_2}$$ captures pairwise affinities between elements of the two modalities. Attention weights are derived from $$\mathbf{C}_i$$ to produce modality-specific attended representations that encode information from both modalities.
 
 Transformer architectures have been adapted for multimodal learning by treating embeddings from different modalities as different types of tokens in a sequence. Given modality embeddings, we add modality-specific positional encodings:
 
@@ -139,25 +139,25 @@ $$
 \tilde{\mathbf{z}}_i^{(m)} = \mathbf{z}_i^{(m)} + \mathbf{e}^{(m)}
 $$
 
-where $\mathbf{e}^{(m)}$ is a learned modality embedding. These tokens are then processed by transformer layers:
+where $$\mathbf{e}^{(m)}$$ is a learned modality embedding. These tokens are then processed by transformer layers:
 
 $$
 \mathbf{Z}_i^{(l+1)} = \text{TransformerLayer}(\mathbf{Z}_i^{(l)})
 $$
 
-where $\mathbf{Z}_i^{(l)} = [\tilde{\mathbf{z}}_i^{(1)}, \tilde{\mathbf{z}}_i^{(2)}, \ldots, \tilde{\mathbf{z}}_i^{(M)}]$ at layer $l$. The transformer's self-attention mechanism allows each modality to attend to all others, learning rich cross-modal interactions. The final prediction is typically derived from a special classification token or by pooling across all modality tokens.
+where $$\mathbf{Z}_i^{(l)} = [\tilde{\mathbf{z}}_i^{(1)}, \tilde{\mathbf{z}}_i^{(2)}, \ldots, \tilde{\mathbf{z}}_i^{(M)}]$$ at layer $$l$$. The transformer's self-attention mechanism allows each modality to attend to all others, learning rich cross-modal interactions. The final prediction is typically derived from a special classification token or by pooling across all modality tokens.
 
 ### Joint Embedding Spaces and Contrastive Learning
 
 An alternative approach to multimodal learning focuses on learning a joint embedding space where semantically similar inputs from different modalities are mapped to nearby points. This is particularly valuable when we have paired multimodal data but limited labeled outcomes. For instance, we might have many chest X-rays with associated radiology reports but few with disease labels.
 
-Contrastive learning trains encoders to maximize agreement between different views of the same entity while minimizing agreement between different entities. For modalities $ m $ and $ m'$ with paired data $(\mathbf{x}_i^{(m)}, \mathbf{x}_i^{(m')})$, we compute embeddings and maximize their similarity while minimizing similarity to negative pairs:
+Contrastive learning trains encoders to maximize agreement between different views of the same entity while minimizing agreement between different entities. For modalities $$ m $$ and $$ m'$$ with paired data $$(\mathbf{x}_i^{(m)}, \mathbf{x}_i^{(m')})$$, we compute embeddings and maximize their similarity while minimizing similarity to negative pairs:
 
 $$
 \mathcal{L}_{\text{contrast}} = -\log \frac{\exp(\text{sim}(\mathbf{z}_i^{(m)}, \mathbf{z}_i^{(m')}) / \tau)}{\sum_{j \neq i} \exp(\text{sim}(\mathbf{z}_i^{(m)}, \mathbf{z}_j^{(m')}) / \tau)}
 $$
 
-where $\text{sim}(\cdot, \cdot)$ is a similarity function (typically cosine similarity), and $\tau $ is a temperature parameter. This loss, known as InfoNCE, encourages the encoders to produce aligned representations across modalities. In clinical settings, this allows learning from image-text pairs (such as radiographs and reports) without explicit labels, then fine-tuning on smaller labeled datasets for specific tasks.
+where $$\text{sim}(\cdot, \cdot)$$ is a similarity function (typically cosine similarity), and $$\tau $$ is a temperature parameter. This loss, known as InfoNCE, encourages the encoders to produce aligned representations across modalities. In clinical settings, this allows learning from image-text pairs (such as radiographs and reports) without explicit labels, then fine-tuning on smaller labeled datasets for specific tasks.
 
 The CLIP (Contrastive Language-Image Pre-training) framework has demonstrated remarkable success in learning joint vision-language representations. Adaptations for clinical data, such as BiomedCLIP and RadFM, learn alignments between medical images and clinical text, enabling zero-shot or few-shot prediction on new tasks by computing similarity between image embeddings and text descriptions of diseases.
 
@@ -167,7 +167,7 @@ The CLIP (Contrastive Language-Image Pre-training) framework has demonstrated re
 
 Medical imaging reports naturally pair images with text, making vision-language models particularly applicable. The standard architecture consists of an image encoder (typically a convolutional neural network or vision transformer), a text encoder (typically a transformer-based language model), and a mechanism to align their representations.
 
-For a chest radiograph $\mathbf{x}_{\text{img}}$ and associated report $\mathbf{x}_{\text{text}}$, we compute:
+For a chest radiograph $$\mathbf{x}_{\text{img}}$$ and associated report $$\mathbf{x}_{\text{text}}$$, we compute:
 
 $$
 \mathbf{z}_{\text{img}} = \phi_{\text{img}}(\mathbf{x}_{\text{img}}), \quad \mathbf{z}_{\text{text}} = \phi_{\text{text}}(\mathbf{x}_{\text{text}})
@@ -199,7 +199,7 @@ $$
 \mathbf{z}_{\text{med}} = \sum_{j} \mathbf{E}_{\text{med}}[x_{\text{med},j}]
 $$
 
-where $\mathbf{E}_{\text{med}}$ is a learned embedding matrix. Time-series data (vital signs, treatments over time) are processed by recurrent networks or transformers:
+where $$\mathbf{E}_{\text{med}}$$ is a learned embedding matrix. Time-series data (vital signs, treatments over time) are processed by recurrent networks or transformers:
 
 $$
 \mathbf{z}_{\text{ts}} = \text{RNN}(\{\mathbf{x}_{\text{ts}}^{(t_1)}, \mathbf{x}_{\text{ts}}^{(t_2)}, \ldots\})
@@ -245,7 +245,7 @@ $$
 \hat{y} = \text{softmax}(W_{\text{out}} \text{Pool}(\mathbf{H}) + b_{\text{out}})
 $$
 
-The modality embeddings $\mathbf{e}_{\text{img}}, \mathbf{e}_{\text{text}}, \mathbf{e}_{\text{lab}}$ inform the transformer which modality each token represents. The pooling operation aggregates information across modalities, typically using the first token's output (if a CLS token is prepended) or average pooling.
+The modality embeddings $$\mathbf{e}_{\text{img}}, \mathbf{e}_{\text{text}}, \mathbf{e}_{\text{lab}}$$ inform the transformer which modality each token represents. The pooling operation aggregates information across modalities, typically using the first token's output (if a CLS token is prepended) or average pooling.
 
 ## Handling Missing Modalities in Clinical Settings
 
@@ -253,14 +253,14 @@ Missing modalities are pervasive in clinical settings. Not all patients receive 
 
 ### Architectural Strategies for Missing Modalities
 
-**Modality Dropout During Training:** A simple but effective approach introduces modality dropout during training. With probability $ p_{\text{drop}}^{(m)}$, we set the embedding for modality $ m $ to a learned mask token or zero vector:
+**Modality Dropout During Training:** A simple but effective approach introduces modality dropout during training. With probability $$ p_{\text{drop}}^{(m)}$$, we set the embedding for modality $$ m $$ to a learned mask token or zero vector:
 
 $\tilde{\mathbf{z}}_i^{(m)} = \begin{cases}
 \mathbf{z}_i^{(m)} & \text{with probability } 1 - p_{\text{drop}}^{(m)} \\
 \mathbf{z}_{\text{mask}}^{(m)} & \text{with probability } p_{\text{drop}}^{(m)}
 \end{cases}$
 
-This forces the model to learn representations that remain informative even when certain modalities are absent. The dropout probabilities should reflect the expected missingness patterns at deployment: if imaging is available for only fifty percent of patients, set $ p_{\text{drop}}^{(\text{img})} = 0.5$.
+This forces the model to learn representations that remain informative even when certain modalities are absent. The dropout probabilities should reflect the expected missingness patterns at deployment: if imaging is available for only fifty percent of patients, set $$ p_{\text{drop}}^{(\text{img})} = 0.5$$.
 
 **Modality-Specific Adapters:** Another approach trains a universal multimodal model with modality-specific adapter networks that activate only when the modality is present:
 
@@ -268,15 +268,15 @@ $$
 \mathbf{h}_i = \sum_{m=1}^{M} \mathbb{1}[m \in \mathcal{M}_i] \cdot \text{Adapter}^{(m)}(\mathbf{z}_i^{(m)})
 $$
 
-where $\mathcal{M}_i$ is the set of available modalities for patient $i$, and $\mathbb{1}[\cdot]$ is an indicator function. Each adapter is a small feedforward network that transforms modality-specific embeddings to a common space. This architecture naturally handles any combination of available modalities without requiring retraining.
+where $$\mathcal{M}_i$$ is the set of available modalities for patient $$i$$, and $$\mathbb{1}[\cdot]$$ is an indicator function. Each adapter is a small feedforward network that transforms modality-specific embeddings to a common space. This architecture naturally handles any combination of available modalities without requiring retraining.
 
-**Mixture of Modality Experts:** We can train separate expert models for each modality subset, then route each patient to the appropriate expert based on available modalities. For $ M $ modalities, this requires training $ 2^M - 1$ models (one for each non-empty subset). While computationally expensive during training, this approach allows each expert to optimize for its specific input pattern. A gating network can dynamically weight expert predictions when multiple experts are applicable:
+**Mixture of Modality Experts:** We can train separate expert models for each modality subset, then route each patient to the appropriate expert based on available modalities. For $$ M $$ modalities, this requires training $$ 2^M - 1$$ models (one for each non-empty subset). While computationally expensive during training, this approach allows each expert to optimize for its specific input pattern. A gating network can dynamically weight expert predictions when multiple experts are applicable:
 
 $$
 \hat{y}_i = \sum_{s \in \mathcal{S}_i} \alpha_{i,s} \cdot \hat{y}_{i,s}
 $$
 
-where $\mathcal{S}_i$ is the set of experts compatible with patient $i$'s available modalities, and $\alpha_{i,s}$ are learned gating weights.
+where $$\mathcal{S}_i$$ is the set of experts compatible with patient $$i$$'s available modalities, and $$\alpha_{i,s}$$ are learned gating weights.
 
 ### Generative Approaches for Missing Modalities
 
@@ -306,13 +306,13 @@ Missingness patterns often correlate with demographic characteristics and socioe
 
 If a multimodal model's performance degrades significantly when certain modalities are missing, and those modalities are systematically absent in underserved populations, the model will exhibit disparate performance. We must therefore evaluate models across all relevant missingness patterns and demographic groups.
 
-Define a missingness pattern $\mathcal{M} \subseteq \{1, 2, \ldots, M\}$ as a subset of available modalities. For each pattern $\mathcal{M}$ and demographic group $g$, we compute performance metrics:
+Define a missingness pattern $$\mathcal{M} \subseteq \{1, 2, \ldots, M\}$$ as a subset of available modalities. For each pattern $$\mathcal{M}$$ and demographic group $$g$$, we compute performance metrics:
 
 $$
 \text{Performance}(\mathcal{M}, g) = \text{Metric}(\hat{\mathbf{y}}[\mathcal{M}_i = \mathcal{M}, G_i = g], \mathbf{y}[\mathcal{M}_i = \mathcal{M}, G_i = g])
 $$
 
-where $[\cdot]$ denotes subsetting. A model is fair across missingness patterns if performance is similar across groups for each missingness pattern:
+where $$[\cdot]$$ denotes subsetting. A model is fair across missingness patterns if performance is similar across groups for each missingness pattern:
 
 $$
 \lvert \text{Performance}(\mathcal{M}, g) - \text{Performance}(\mathcal{M}, g') \rvert < \epsilon \quad \forall \mathcal{M}, g, g'
@@ -326,7 +326,7 @@ Understanding how multimodal models make predictions is essential for clinical a
 
 ### Attention Visualization
 
-When using attention-based fusion, the attention weights $\alpha^{(m)}$ indicate the relative importance of each modality for a given prediction. Visualizing these weights provides a high-level summary of the model's reasoning:
+When using attention-based fusion, the attention weights $$\alpha^{(m)}$$ indicate the relative importance of each modality for a given prediction. Visualizing these weights provides a high-level summary of the model's reasoning:
 
 $$
 \text{Importance}^{(m)} = \frac{\alpha^{(m)}}{\sum_{m'} \alpha^{(m')}}
@@ -338,7 +338,7 @@ However, attention weights alone do not provide complete interpretability. High 
 
 ### Cross-Modal Gradients
 
-Gradient-based methods can identify which features within each modality contribute most to predictions. For a multimodal model $f(\mathbf{x}^{(1)}, \ldots, \mathbf{x}^{(M)})$, the gradient of the output with respect to inputs in modality $ m$ indicates feature importance:
+Gradient-based methods can identify which features within each modality contribute most to predictions. For a multimodal model $$f(\mathbf{x}^{(1)}, \ldots, \mathbf{x}^{(M)})$$, the gradient of the output with respect to inputs in modality $$ m$$ indicates feature importance:
 
 $$
 \mathbf{g}^{(m)} = \frac{\partial f}{\partial \mathbf{x}^{(m)}}
@@ -376,31 +376,31 @@ This provides feature-level attributions within each modality while naturally ha
 
 ### Modality Ablation Studies
 
-A complementary approach to interpretability systematically removes or masks each modality and measures the change in predictions. For patient $i $ with prediction $\hat{y}_i$ using all modalities, we compute predictions using all subsets:
+A complementary approach to interpretability systematically removes or masks each modality and measures the change in predictions. For patient $$i $$ with prediction $$\hat{y}_i$$ using all modalities, we compute predictions using all subsets:
 
 $$
 \hat{y}_i^{(-m)} = f(\mathbf{x}_i^{(1)}, \ldots, \mathbf{x}_i^{(m-1)}, \mathbf{0}, \mathbf{x}_i^{(m+1)}, \ldots, \mathbf{x}_i^{(M)})
 $$
 
-The importance of modality $m$ is quantified by the change in prediction:
+The importance of modality $$m$$ is quantified by the change in prediction:
 
 $$
 \Delta_i^{(m)} = \lvert \hat{y}_i - \hat{y}_i^{(-m)} \rvert
 $$
 
-This can be extended to measure the importance of modality combinations by ablating multiple modalities simultaneously. Shapley values provide a principled framework for computing feature importance that satisfies desirable axioms (efficiency, symmetry, dummy, additivity). For modality $m$:
+This can be extended to measure the importance of modality combinations by ablating multiple modalities simultaneously. Shapley values provide a principled framework for computing feature importance that satisfies desirable axioms (efficiency, symmetry, dummy, additivity). For modality $$m$$:
 
 $$
 \phi^{(m)} = \sum_{\mathcal{S} \subseteq \mathcal{M} \setminus \{m\}} \frac{\lvert \mathcal{S} \rvert! (M - \lvert \mathcal{S} \rvert - 1)!}{M!} [f(\mathcal{S} \cup \{m\}) - f(\mathcal{S})]
 $$
 
-where $\mathcal{M}$ is the set of all modalities, and $ f(\mathcal{S})$ is the model's prediction using only modalities in set $\mathcal{S}$. Computing exact Shapley values requires evaluating $ 2^M$ subsets, but efficient approximations exist.
+where $$\mathcal{M}$$ is the set of all modalities, and $$ f(\mathcal{S})$$ is the model's prediction using only modalities in set $$\mathcal{S}$$. Computing exact Shapley values requires evaluating $$ 2^M$$ subsets, but efficient approximations exist.
 
 ### Concept-Based Explanations
 
 High-level clinical concepts may not align with individual features within modalities. Concept-based interpretability methods learn or define clinically meaningful concepts, then assess how much each concept contributed to a prediction.
 
-For a predefined set of clinical concepts $\{c_1, c_2, \ldots, c_K\}$ (such as "pulmonary edema," "elevated creatinine," "history of heart failure"), we train concept detectors that identify the presence of each concept from multimodal inputs:
+For a predefined set of clinical concepts $$\{c_1, c_2, \ldots, c_K\}$$ (such as "pulmonary edema," "elevated creatinine," "history of heart failure"), we train concept detectors that identify the presence of each concept from multimodal inputs:
 
 $$
 p(c_k \mid \mathbf{x}^{(1)}, \ldots, \mathbf{x}^{(M)}) = g_k(\phi^{(1)}(\mathbf{x}^{(1)}), \ldots, \phi^{(M)}(\mathbf{x}^{(M)}))

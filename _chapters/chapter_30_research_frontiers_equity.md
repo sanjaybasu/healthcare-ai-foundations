@@ -45,13 +45,13 @@ Consider screening for a disease where follow-up diagnostic testing is invasive 
 
 Clinically-weighted fairness metrics explicitly incorporate the clinical and social costs of different error types into fairness definitions. Rather than requiring equal error rates, these metrics require that the expected harm from algorithmic errors be equalized across groups, where harm is measured using utilities that capture clinical consequences and differential vulnerabilities.
 
-Formally, let $ h(y, \hat{y}, x, z) $ denote the harm caused by predicting $ \hat{y} $ when the true label is $ y $ for a patient with features $ x $ and demographic attributes $ z $. The harm function incorporates clinical factors (disease severity, treatment invasiveness, downstream consequences of correct and incorrect predictions) and social factors (financial capacity, healthcare access, social support). A clinically-weighted fairness metric requires that expected harm be approximately equal across demographic groups:
+Formally, let $$ h(y, \hat{y}, x, z) $$ denote the harm caused by predicting $$ \hat{y} $$ when the true label is $$ y $$ for a patient with features $$ x $$ and demographic attributes $$ z $$. The harm function incorporates clinical factors (disease severity, treatment invasiveness, downstream consequences of correct and incorrect predictions) and social factors (financial capacity, healthcare access, social support). A clinically-weighted fairness metric requires that expected harm be approximately equal across demographic groups:
 
 $$
 \mathbb{E}[h(Y, \hat{Y}, X, Z) \mid Z = z] \approx \mathbb{E}[h(Y, \hat{Y}, X, Z) \mid Z = z']
 $$
 
-for all demographic groups $ z, z' $.
+for all demographic groups $$ z, z' $$.
 
 The challenge lies in specifying appropriate harm functions. These should reflect clinical evidence about the consequences of different prediction errors, but they must also incorporate the differential vulnerabilities that make identical clinical errors cause different overall harms across populations. Participatory processes involving clinicians, patients, and community members become essential for defining these harm specifications in ways that genuinely capture stakeholder values rather than imposing researcher assumptions.
 
@@ -61,13 +61,13 @@ Healthcare is fundamentally longitudinal. Patients interact with healthcare syst
 
 Standard fairness metrics evaluate predictions at single time points, ignoring these longitudinal dynamics. Emerging longitudinal fairness metrics account for how algorithmic predictions accumulate advantage or disadvantage over time, how prediction errors at one point affect outcomes and future predictions, and how interventions triggered by predictions change the data distribution in ways that may amplify or reduce disparities.
 
-One formulation extends fairness through awareness to the longitudinal setting by requiring that algorithmic predictions not increase existing outcome disparities over time. Let $ G_t(z) $ denote a health outcome gap between demographic group $ z $ and a reference group at time $ t $. Longitudinal fairness requires:
+One formulation extends fairness through awareness to the longitudinal setting by requiring that algorithmic predictions not increase existing outcome disparities over time. Let $$ G_t(z) $$ denote a health outcome gap between demographic group $$ z $$ and a reference group at time $$ t $$. Longitudinal fairness requires:
 
 $$
 G_{t+1}(z) \leq G_t(z) + \epsilon
 $$
 
-for all groups $ z $ and some small tolerance $ \epsilon $. This ensures that algorithmic interventions do not worsen existing disparities even if they fail to eliminate them entirely.
+for all groups $$ z $$ and some small tolerance $$ \epsilon $$. This ensures that algorithmic interventions do not worsen existing disparities even if they fail to eliminate them entirely.
 
 Another formulation considers the expected life course trajectory of individuals under algorithmic decision-making, requiring that expected cumulative health utility be equalized across demographic groups when accounting for the full sequence of algorithmic predictions and interventions a person receives:
 
@@ -75,7 +75,7 @@ $$
 \mathbb{E}\left[\sum_{t=1}^T u_t(Y_t, \hat{Y}_t, I_t) \mid Z = z\right] \approx \mathbb{E}\left[\sum_{t=1}^T u_t(Y_t, \hat{Y}_t, I_t) \mid Z = z'\right]
 $$
 
-where $ u_t $ is the utility at time $ t $, $ Y_t $ is the true outcome, $ \hat{Y}_t $ is the prediction, and $ I_t $ is the intervention triggered by the prediction.
+where $$ u_t $$ is the utility at time $$ t $$, $$ Y_t $$ is the true outcome, $$ \hat{Y}_t $$ is the prediction, and $$ I_t $$ is the intervention triggered by the prediction.
 
 These longitudinal metrics require rethinking both model development and validation. Training objectives must account for long-term fairness criteria rather than optimizing single-prediction accuracy. Validation requires longitudinal data and simulation of sequential decision processes to assess cumulative impacts. Implementing these approaches is an active area of research with significant open challenges.
 
@@ -87,13 +87,13 @@ The core difficulty is that standard fairness metrics assume resources are unlim
 
 Resource-constrained fairness metrics explicitly model the allocation problem. Rather than evaluating predictions in isolation, these metrics evaluate allocation policies that map from a population of patients and available resources to assignments of resources to patients. Fairness is defined over allocation outcomes rather than over individual predictions.
 
-One formulation uses the concept of envy-freeness from economics: an allocation is envy-free if no patient would prefer another patient's allocation over their own, given their own characteristics and needs. This can be extended to require group envy-freeness, where no demographic group collectively would prefer another group's allocation. Formally, let $ A $ be an allocation policy assigning limited resources to patients. The policy is group envy-free if:
+One formulation uses the concept of envy-freeness from economics: an allocation is envy-free if no patient would prefer another patient's allocation over their own, given their own characteristics and needs. This can be extended to require group envy-freeness, where no demographic group collectively would prefer another group's allocation. Formally, let $$ A $$ be an allocation policy assigning limited resources to patients. The policy is group envy-free if:
 
 $$
 \mathbb{E}[u(A(X, Z), X, Z) \mid Z = z] \geq \mathbb{E}[u(A(X, Z'), X, Z) \mid Z = z]
 $$
 
-for all groups $ z $ and alternative assignments $ Z' $.
+for all groups $$ z $$ and alternative assignments $$ Z' $$.
 
 Another formulation uses fair division principles from social choice theory, requiring that allocations maximize a social welfare function that explicitly incorporates equity concerns. For example, a maximin criterion prioritizes improving outcomes for the worst-off group, while a proportional fairness criterion balances efficiency and equality by maximizing the sum of logarithms of group utilities.
 
@@ -967,13 +967,13 @@ Few-shot learning methods train models that can rapidly adapt to new tasks with 
 
 The core challenge is ensuring that few-shot adaptation preserves fairness. Standard meta-learning optimizes for rapid adaptation without considering how performance varies across demographic groups. A model might learn to adapt quickly for majority populations while failing to effectively adapt for minority groups. Fairness-aware few-shot learning incorporates equity constraints into the meta-learning objective.
 
-One approach extends Model-Agnostic Meta-Learning (MAML) to include fairness penalties. Standard MAML learns model initialization parameters $ \theta $ that enable rapid adaptation to new tasks. For a set of training tasks $ \{T_i\} $, MAML minimizes:
+One approach extends Model-Agnostic Meta-Learning (MAML) to include fairness penalties. Standard MAML learns model initialization parameters $$ \theta $$ that enable rapid adaptation to new tasks. For a set of training tasks $$ \{T_i\} $$, MAML minimizes:
 
 $$
 \min_\theta \sum_i \mathcal{L}_{T_i}(\theta - \alpha \nabla_\theta \mathcal{L}_{T_i}(\theta))
 $$
 
-where $ \alpha $ is the adaptation learning rate. This objective encourages finding initialization parameters that require only small gradient updates to achieve good performance on new tasks.
+where $$ \alpha $$ is the adaptation learning rate. This objective encourages finding initialization parameters that require only small gradient updates to achieve good performance on new tasks.
 
 Fairness-aware MAML adds a fairness penalty term that penalizes disparity in adaptation effectiveness across demographic groups:
 
@@ -981,7 +981,7 @@ $$
 \min_\theta \sum_i \left[\mathcal{L}_{T_i}(\theta') + \lambda F(\theta', T_i)\right]
 $$
 
-where $ \theta' = \theta - \alpha \nabla_\theta \mathcal{L}_{T_i}(\theta) $ are the adapted parameters and $ F(\theta', T_i) $ measures fairness on task $ T_i $ using the adapted model. The fairness term $ F $ might measure disparity in accuracy, calibration error, or other metrics across demographic subgroups within each task.
+where $$ \theta' = \theta - \alpha \nabla_\theta \mathcal{L}_{T_i}(\theta) $$ are the adapted parameters and $$ F(\theta', T_i) $$ measures fairness on task $$ T_i $$ using the adapted model. The fairness term $$ F $$ might measure disparity in accuracy, calibration error, or other metrics across demographic subgroups within each task.
 
 This formulation encourages the meta-learning process to find initialization parameters that enable both effective and equitable adaptation. When presented with a new clinical prediction task with limited labeled data including small sample sizes for certain demographic groups, the resulting model can adapt using those small samples while maintaining performance parity across groups.
 
@@ -995,7 +995,7 @@ $$
 \min_\theta \mathcal{L}_{\text{target}}(\theta) \quad \text{subject to} \quad d(\theta, \theta_{\text{pretrain}}) \leq \delta_{\text{fair}}
 $$
 
-where $ \theta_{\text{pretrain}} $ are the pretrained parameters, $ \mathcal{L}_{\text{target}} $ is the loss on the target task, and $ d(\cdot, \cdot) $ measures fairness degradation. The constraint ensures that fine-tuning does not worsen fairness beyond a tolerance $ \delta_{\text{fair}} $ even as it optimizes for target task performance.
+where $$ \theta_{\text{pretrain}} $$ are the pretrained parameters, $$ \mathcal{L}_{\text{target}} $$ is the loss on the target task, and $$ d(\cdot, \cdot) $$ measures fairness degradation. The constraint ensures that fine-tuning does not worsen fairness beyond a tolerance $$ \delta_{\text{fair}} $$ even as it optimizes for target task performance.
 
 Another approach uses adversarial training during fine-tuning to remove demographic information from learned representations while preserving clinically relevant information. This involves training the model to perform the target task well while making predictions that cannot be used to infer demographic group membership:
 
@@ -1003,7 +1003,7 @@ $$
 \min_\theta \max_\phi \mathcal{L}_{\text{target}}(\theta) - \lambda \mathcal{L}_{\text{demographic}}(\phi, \theta)
 $$
 
-where $ \phi $ parameterizes an adversarial classifier attempting to predict demographic group from model representations and $ \lambda $ controls the tradeoff between task performance and demographic invariance.
+where $$ \phi $$ parameterizes an adversarial classifier attempting to predict demographic group from model representations and $$ \lambda $$ controls the tradeoff between task performance and demographic invariance.
 
 For healthcare applications, partial fine-tuning strategies can be effective. Rather than fine-tuning all model parameters, we can freeze lower layers that capture general clinical knowledge and only fine-tune higher layers that perform task-specific reasoning. This reduces the number of parameters adapted to the target domain, making fine-tuning more sample-efficient and reducing the risk of overfitting to unrepresentative target data.
 
@@ -1652,9 +1652,9 @@ $$
 \max_\theta \mathbb{E}[H(X, Y, \hat{Y}_\theta, Z)] - \lambda \cdot \text{Var}_Z[\mathbb{E}[H(X, Y, \hat{Y}_\theta, Z) \mid Z]]
 $$
 
-where $ H $ measures health utility, $ \hat{Y}_\theta $ are model predictions, $ Z $ represents demographic group, and the variance term penalizes disparities in average health utility across groups. The parameter $ \lambda $ controls how heavily disparity reduction is weighted relative to overall health improvement.
+where $$ H $$ measures health utility, $$ \hat{Y}_\theta $$ are model predictions, $$ Z $$ represents demographic group, and the variance term penalizes disparities in average health utility across groups. The parameter $$ \lambda $$ controls how heavily disparity reduction is weighted relative to overall health improvement.
 
-This objective creates different incentives than standard accuracy optimization. A model might achieve high accuracy by performing well on the majority population while doing poorly on minorities. Disparity-reducing optimization instead prioritizes improvements for groups with worse baseline outcomes, even if this comes at some cost to overall accuracy. The choice of $ \lambda $ reflects normative judgments about the relative importance of efficiency versus equity.
+This objective creates different incentives than standard accuracy optimization. A model might achieve high accuracy by performing well on the majority population while doing poorly on minorities. Disparity-reducing optimization instead prioritizes improvements for groups with worse baseline outcomes, even if this comes at some cost to overall accuracy. The choice of $$ \lambda $$ reflects normative judgments about the relative importance of efficiency versus equity.
 
 Another formulation uses a maximin objective that explicitly prioritizes the worst-off group:
 
@@ -1670,7 +1670,7 @@ $$
 \min_\theta \sum_i w_{z_i} \cdot \mathcal{L}(y_i, \hat{y}_\theta(x_i))
 $$
 
-where $ w_{z_i} $ is the weight for patient $ i $ 's demographic group $ z_i $. Groups with historically worse outcomes receive higher weights, incentivizing the model to prioritize improving predictions for these populations. Weight specifications should reflect both historical disparities and stakeholder input about whose health improvements should be prioritized.
+where $$ w_{z_i} $$ is the weight for patient $$ i $$ 's demographic group $$ z_i $$. Groups with historically worse outcomes receive higher weights, incentivizing the model to prioritize improving predictions for these populations. Weight specifications should reflect both historical disparities and stakeholder input about whose health improvements should be prioritized.
 
 ### 30.4.2 Preferential Resource Allocation Policies
 
@@ -1684,7 +1684,7 @@ $$
 U_{\text{total}} = \sum_i w_{z_i} \cdot u_i
 $$
 
-where $ u_i $ is the health utility for patient $ i $ and $ w_{z_i} $ is a weight that reflects both clinical need and historical disadvantage. This makes explicit that we value improvements for patients from marginalized communities more highly than equivalent improvements for those from privileged backgrounds, reflecting a commitment to disparity reduction.
+where $$ u_i $$ is the health utility for patient $$ i $$ and $$ w_{z_i} $$ is a weight that reflects both clinical need and historical disadvantage. This makes explicit that we value improvements for patients from marginalized communities more highly than equivalent improvements for those from privileged backgrounds, reflecting a commitment to disparity reduction.
 
 Another approach uses explicit quotas or targets for representation of underserved populations in allocated resources. An organ allocation system might require that at least 30% of transplants go to patients from historically underserved racial groups, reflecting these groups' proportion of patients with end-stage organ failure. This creates hard constraints ensuring that resources reach marginalized populations even when efficiency-focused algorithms would allocate them elsewhere.
 

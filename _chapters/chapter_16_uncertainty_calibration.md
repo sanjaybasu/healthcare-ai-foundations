@@ -771,19 +771,19 @@ $$
 p_{calibrated} = \frac{1}{1 + \exp(a \cdot \text{logit}(p) + b)}
 $$
 
-where $ p $ is the original predicted probability and $ a, b $ are parameters fit to the calibration data. This method assumes miscalibration follows a specific parametric form that can be corrected through a sigmoid transformation. Platt scaling works well when calibration errors are monotonic and can be addressed through a global transformation, but it may fail to correct more complex non-monotonic calibration patterns.
+where $$ p $$ is the original predicted probability and $$ a, b $$ are parameters fit to the calibration data. This method assumes miscalibration follows a specific parametric form that can be corrected through a sigmoid transformation. Platt scaling works well when calibration errors are monotonic and can be addressed through a global transformation, but it may fail to correct more complex non-monotonic calibration patterns.
 
 Isotonic regression provides a more flexible non-parametric alternative that learns a monotonic mapping from predicted probabilities to calibrated probabilities. The method fits a piecewise constant function that is monotonically increasing and minimizes squared error between predicted and observed frequencies. Isotonic regression can correct arbitrarily complex calibration patterns as long as they respect monotonicity, making it particularly useful when miscalibration varies across the probability range in unpredictable ways.
 
 However, isotonic regression's flexibility comes at the cost of requiring more calibration data to avoid overfitting, and its piecewise constant form can produce discontinuous calibrated probabilities that may be undesirable for some applications. The method is also more prone to overfitting on small calibration sets compared to parametric approaches, potentially degrading rather than improving calibration when calibration data is limited.
 
-Temperature scaling represents a simplified variant of Platt scaling particularly popular for calibrating neural networks. The method learns a single scalar temperature parameter $ T $ that divides the logits (log-odds) before applying the softmax function:
+Temperature scaling represents a simplified variant of Platt scaling particularly popular for calibrating neural networks. The method learns a single scalar temperature parameter $$ T $$ that divides the logits (log-odds) before applying the softmax function:
 
 $$
 p_{calibrated} = \text{softmax}(z/T)
 $$
 
-where $ z $ are the model's logits. Temperature scaling preserves the rank ordering of predictions and maintains the model's confidence ratios, only adjusting the overall confidence level. This simplicity makes temperature scaling extremely data-efficient, requiring minimal calibration data to fit a single parameter, but it cannot correct complex calibration patterns that vary across the probability range or between different classes in multi-class problems.
+where $$ z $$ are the model's logits. Temperature scaling preserves the rank ordering of predictions and maintains the model's confidence ratios, only adjusting the overall confidence level. This simplicity makes temperature scaling extremely data-efficient, requiring minimal calibration data to fit a single parameter, but it cannot correct complex calibration patterns that vary across the probability range or between different classes in multi-class problems.
 
 For equity applications, calibration correction must consider whether recalibration methods preserve or improve fairness properties. A naive approach that performs single global recalibration on pooled data from all demographic groups may improve overall calibration while worsening calibration within specific subgroups if miscalibration patterns differ across groups. For example, if the model systematically overestimates risk for Black patients and underestimates risk for Hispanic patients, a single global calibration curve that averages these opposite biases may leave both groups with poor calibration after correction.
 
@@ -1185,25 +1185,25 @@ In practice, a principled approach involves first investigating why miscalibrati
 
 Conformal prediction provides a fundamentally different approach to uncertainty quantification that makes minimal statistical assumptions while providing formal coverage guarantees. Rather than attempting to accurately estimate the entire outcome distribution, conformal methods construct prediction sets or intervals that contain the true outcome with a pre-specified probability regardless of the true underlying distribution. This distribution-free property makes conformal prediction particularly valuable for healthcare applications where distributional assumptions may be violated and where we need uncertainty quantification that is reliable even when the model is systematically biased or poorly calibrated.
 
-The core insight of conformal prediction is to use held-out calibration data to assess whether a new prediction appears consistent with the distribution of calibration residuals. For regression problems, we compute non-conformity scores measuring how unusual each prediction is compared to calibration set predictions. For a new test point, we construct a prediction interval containing all outcome values that would have non-conformity scores similar to those observed in the calibration set. This approach guarantees that the prediction interval contains the true outcome with probability at least $ (1-\alpha) $ for a user-specified significance level $ \alpha $, regardless of whether the model is well-calibrated, unbiased, or even accurate.
+The core insight of conformal prediction is to use held-out calibration data to assess whether a new prediction appears consistent with the distribution of calibration residuals. For regression problems, we compute non-conformity scores measuring how unusual each prediction is compared to calibration set predictions. For a new test point, we construct a prediction interval containing all outcome values that would have non-conformity scores similar to those observed in the calibration set. This approach guarantees that the prediction interval contains the true outcome with probability at least $$ (1-\alpha) $$ for a user-specified significance level $$ \alpha $$, regardless of whether the model is well-calibrated, unbiased, or even accurate.
 
 For binary classification, conformal prediction can construct prediction sets containing one or both classes based on whether including each class would yield non-conformity scores consistent with the calibration distribution. This approach provides formal guarantees about the probability that the prediction set contains the true class, with the set potentially containing both classes when the model is uncertain and only the predicted class when the model is confident. The key advantage over traditional probability estimates is that coverage is guaranteed regardless of whether the model's probability estimates are well-calibrated.
 
 ### 16.3.1 Conformal Prediction Framework
 
-We begin by formalizing the standard conformal prediction framework before extending it to address health equity considerations. Consider a calibration set of $ n $ examples $ (X_i, Y_i) $ for $ i=1,...,n $ and a model $ \hat{f} $ producing predictions $ \hat{Y}_i = \hat{f}(X_i) $. We define a non-conformity score $ s(X_i, Y_i) $ measuring how different the true outcome $ Y_i $ is from the prediction $ \hat{Y}_i $. For regression, a natural non-conformity score is the absolute residual:
+We begin by formalizing the standard conformal prediction framework before extending it to address health equity considerations. Consider a calibration set of $$ n $$ examples $$ (X_i, Y_i) $$ for $$ i=1,...,n $$ and a model $$ \hat{f} $$ producing predictions $$ \hat{Y}_i = \hat{f}(X_i) $$. We define a non-conformity score $$ s(X_i, Y_i) $$ measuring how different the true outcome $$ Y_i $$ is from the prediction $$ \hat{Y}_i $$. For regression, a natural non-conformity score is the absolute residual:
 
 $$
 s(X_i, Y_i) = \lvert Y_i - \hat{Y}_i \rvert
 $$
 
-For a new test point $ X_{n+1} $ with unknown outcome $ Y_{n+1} $, we want to construct a prediction interval $ C(X_{n+1}) $ such that $ P(Y_{n+1} \in C(X_{n+1})) \geq 1 - \alpha $. The conformal prediction interval is defined as:
+For a new test point $$ X_{n+1} $$ with unknown outcome $$ Y_{n+1} $$, we want to construct a prediction interval $$ C(X_{n+1}) $$ such that $$ P(Y_{n+1} \in C(X_{n+1})) \geq 1 - \alpha $$. The conformal prediction interval is defined as:
 
 $$
 C(X_{n+1}) = \{y : s(X_{n+1}, y) \leq q_{\alpha}\}
 $$
 
-where $ q_{\alpha} $ is the $ (1-\alpha)(n+1)/n $ quantile of the calibration non-conformity scores $ \{s(X_i, Y_i)\}_{i=1}^n $. This construction guarantees that the prediction interval contains the true outcome with probability at least $ 1-\alpha $ under the exchangeability assumption that $ (X_1, Y_1), ..., (X_n, Y_n), (X_{n+1}, Y_{n+1}) $ are exchangeable random variables.
+where $$ q_{\alpha} $$ is the $$ (1-\alpha)(n+1)/n $$ quantile of the calibration non-conformity scores $$ \{s(X_i, Y_i)\}_{i=1}^n $$. This construction guarantees that the prediction interval contains the true outcome with probability at least $$ 1-\alpha $$ under the exchangeability assumption that $$ (X_1, Y_1), ..., (X_n, Y_n), (X_{n+1}, Y_{n+1}) $$ are exchangeable random variables.
 
 The exchangeability assumption is weaker than the typical independent and identically distributed (i.i.d.) assumption in machine learning, requiring only that the joint distribution is invariant under permutations rather than requiring independence or stationarity. However, exchangeability still represents a strong assumption that may fail in healthcare applications due to systematic differences between calibration and test sets arising from distribution shift, population differences, or temporal trends. When exchangeability fails, standard conformal prediction may not achieve nominal coverage.
 
@@ -1211,13 +1211,13 @@ The exchangeability assumption is weaker than the typical independent and identi
 
 For health equity applications, we often care about achieving valid coverage not just overall but also within specific demographic subgroups that may have different prediction error distributions. Standard conformal prediction provides marginal coverage guarantees that hold on average across the entire population, but these guarantees may hide substantial variation in coverage across subgroups. If the model performs differently for different demographic groups, the prediction intervals may be too narrow for some groups (achieving less than nominal coverage) and too wide for others (achieving more than nominal coverage but at the cost of less informative predictions).
 
-Group-conditional conformal prediction addresses this limitation by constructing separate prediction sets for each demographic group, guaranteeing valid coverage within each group. Let $ G \in \{1, ..., K\} $ denote group membership. For each group $ g $, we compute group-specific quantiles $ q_{\alpha,g} $ from calibration examples in that group:
+Group-conditional conformal prediction addresses this limitation by constructing separate prediction sets for each demographic group, guaranteeing valid coverage within each group. Let $$ G \in \{1, ..., K\} $$ denote group membership. For each group $$ g $$, we compute group-specific quantiles $$ q_{\alpha,g} $$ from calibration examples in that group:
 
 $$
 q_{\alpha,g} = \text{Quantile}_{1-\alpha}\{s(X_i, Y_i) : G_i = g, i = 1,...,n\}
 $$
 
-For a new test point in group $ g $, we construct the prediction interval using the group-specific quantile:
+For a new test point in group $$ g $$, we construct the prediction interval using the group-specific quantile:
 
 $$
 C_g(X_{n+1}) = \{y : s(X_{n+1}, y) \leq q_{\alpha,g}\}
@@ -1668,19 +1668,19 @@ However, group-conditional approaches face practical challenges including the ne
 
 Bayesian approaches to machine learning provide a principled framework for reasoning about uncertainty by maintaining distributions over model parameters rather than point estimates. This probabilistic treatment naturally quantifies epistemic uncertainty arising from limited training data, distinguishing it from aleatoric uncertainty inherent in stochastic outcomes. For clinical applications, this distinction matters because epistemic uncertainty decreases with more training data while aleatoric uncertainty remains irreducible, and because interventions to improve model reliability differ depending on which type of uncertainty dominates.
 
-In the Bayesian framework, we specify a prior distribution $ p(\theta) $ over model parameters $ \theta $ encoding our initial beliefs before observing data. Upon observing training data $ \mathcal{D} = \{(x_i, y_i)\}_{i=1}^n $, we update this prior using Bayes' rule to obtain a posterior distribution:
+In the Bayesian framework, we specify a prior distribution $$ p(\theta) $$ over model parameters $$ \theta $$ encoding our initial beliefs before observing data. Upon observing training data $$ \mathcal{D} = \{(x_i, y_i)\}_{i=1}^n $$, we update this prior using Bayes' rule to obtain a posterior distribution:
 
 $$
 p(\theta \mid \mathcal{D}) = \frac{p(\mathcal{D} \mid \theta) p(\theta)}{p(\mathcal{D})}
 $$
 
-The posterior distribution represents our updated uncertainty about model parameters after observing the data. For predictions on a new point $ x^* $, we integrate over the posterior to obtain the predictive distribution:
+The posterior distribution represents our updated uncertainty about model parameters after observing the data. For predictions on a new point $$ x^* $$, we integrate over the posterior to obtain the predictive distribution:
 
 $$
 p(y^* \mid x^*, \mathcal{D}) = \int p(y^* \rvert x^*, \theta) p(\theta \mid \mathcal{D}) d\theta
 $$
 
-This predictive distribution captures both epistemic uncertainty through the posterior distribution over parameters and aleatoric uncertainty through the likelihood $ p(y^* \mid x^*, \theta) $ for each parameter setting. The width of the predictive distribution reflects our total uncertainty about the outcome, with wider distributions for predictions far from training data where epistemic uncertainty is high.
+This predictive distribution captures both epistemic uncertainty through the posterior distribution over parameters and aleatoric uncertainty through the likelihood $$ p(y^* \mid x^*, \theta) $$ for each parameter setting. The width of the predictive distribution reflects our total uncertainty about the outcome, with wider distributions for predictions far from training data where epistemic uncertainty is high.
 
 For health equity applications, Bayesian uncertainty quantification offers several potential advantages. The explicit modeling of parameter uncertainty enables identifying when predictions for certain patient populations are highly uncertain due to limited training data from similar patients. This can help flag situations where model predictions should be supplemented with additional clinical judgment, particularly for underrepresented demographic groups. The principled combination of prior information with observed data enables incorporating domain knowledge about equitable treatment effects or biological mechanisms that may be poorly represented in limited training data.
 
@@ -1688,9 +1688,9 @@ However, Bayesian methods also face significant challenges for equity applicatio
 
 ### 16.4.1 Monte Carlo Dropout
 
-Monte Carlo (MC) dropout provides a computationally efficient approximation to Bayesian inference in neural networks by interpreting dropout as a form of approximate variational inference. Standard dropout, originally introduced as a regularization technique, randomly deactivates neurons during training with probability $ p $, forcing the network to learn robust representations that don't rely on any single neuron. At test time, standard practice is to deactivate dropout and use all neurons, averaging over the stochastic behavior seen during training.
+Monte Carlo (MC) dropout provides a computationally efficient approximation to Bayesian inference in neural networks by interpreting dropout as a form of approximate variational inference. Standard dropout, originally introduced as a regularization technique, randomly deactivates neurons during training with probability $$ p $$, forcing the network to learn robust representations that don't rely on any single neuron. At test time, standard practice is to deactivate dropout and use all neurons, averaging over the stochastic behavior seen during training.
 
-MC dropout instead keeps dropout active during test time, performing multiple forward passes with different random dropout masks and treating the resulting distribution of predictions as an approximation to the Bayesian predictive distribution. For a test input $ x^* $, we generate $ T $ stochastic predictions $ \{\hat{y}_t^*\}_{t=1}^T $ using different dropout masks, then compute mean and variance:
+MC dropout instead keeps dropout active during test time, performing multiple forward passes with different random dropout masks and treating the resulting distribution of predictions as an approximation to the Bayesian predictive distribution. For a test input $$ x^* $$, we generate $$ T $$ stochastic predictions $$ \{\hat{y}_t^*\}_{t=1}^T $$ using different dropout masks, then compute mean and variance:
 
 $$
 \mu(x^*) = \frac{1}{T} \sum_{t=1}^T \hat{y}_t^*
@@ -1700,7 +1700,7 @@ $$
 \sigma^2(x^*) = \frac{1}{T} \sum_{t=1}^T (\hat{y}_t^* - \mu(x^*))^2
 $$
 
-The variance $ \sigma^2(x^*) $ provides an estimate of predictive uncertainty, with higher variance indicating greater uncertainty. This approach is computationally efficient because it requires only multiple forward passes through an existing trained network without any changes to the training procedure or network architecture beyond standard dropout.
+The variance $$ \sigma^2(x^*) $$ provides an estimate of predictive uncertainty, with higher variance indicating greater uncertainty. This approach is computationally efficient because it requires only multiple forward passes through an existing trained network without any changes to the training procedure or network architecture beyond standard dropout.
 
 However, MC dropout's theoretical justification as variational inference relies on specific assumptions about dropout probability, weight regularization, and network architecture that may not hold in practice. Empirical studies have found that MC dropout uncertainty estimates can be miscalibrated and may not reliably reflect true prediction quality across different data distributions. For equity applications, a critical question is whether MC dropout uncertainty properly increases for predictions on underrepresented populations where epistemic uncertainty should be high, or whether the dropout-based uncertainty primarily reflects model architecture rather than true uncertainty about outcomes.
 
@@ -2121,7 +2121,7 @@ Ensemble methods combine predictions from multiple independently trained models 
 
 Deep ensembles specifically refer to ensembles of deep neural networks trained from different random initializations. Despite the same network architecture and training data, different random initializations cause neural networks to find different local optima during training, learning different representations and making different predictions. By collecting multiple such models and examining the spread of their predictions, we obtain an estimate of epistemic uncertainty arising from the training process itself.
 
-For a test input $ x^* $, we generate predictions $ \{\hat{f}_m(x^*)\}_{m=1}^M $ from $ M $ ensemble members, then compute:
+For a test input $$ x^* $$, we generate predictions $$ \{\hat{f}_m(x^*)\}_{m=1}^M $$ from $$ M $$ ensemble members, then compute:
 
 $$
 \mu(x^*) = \frac{1}{M} \sum_{m=1}^M \hat{f}_m(x^*)
@@ -2131,11 +2131,11 @@ $$
 \sigma^2(x^*) = \frac{1}{M} \sum_{m=1}^M (\hat{f}_m(x^*) - \mu(x^*))^2
 $$
 
-The ensemble mean $ \mu(x^*) $ typically provides better predictions than any individual model due to averaging over different model biases. The ensemble variance $ \sigma^2(x^*) $ provides an uncertainty estimate, with high variance when ensemble members disagree indicating high epistemic uncertainty about the prediction.
+The ensemble mean $$ \mu(x^*) $$ typically provides better predictions than any individual model due to averaging over different model biases. The ensemble variance $$ \sigma^2(x^*) $$ provides an uncertainty estimate, with high variance when ensemble members disagree indicating high epistemic uncertainty about the prediction.
 
 Deep ensembles have several advantages for practical uncertainty quantification. They require no changes to model architecture or training procedure beyond training multiple copies of the model. They are highly parallelizable since ensemble members can be trained independently. Empirical studies have found that deep ensembles often provide better-calibrated uncertainty than more theoretically principled Bayesian approximations including MC dropout and variational inference, suggesting that the diversity from different random initializations effectively captures meaningful epistemic uncertainty.
 
-However, deep ensembles also face limitations for equity applications. The computational cost scales linearly with ensemble size, requiring $ M $ times the training time and memory of a single model. Small ensembles may not capture sufficient diversity to provide reliable uncertainty estimates, while large ensembles become prohibitively expensive. Most critically, ensemble disagreement measures epistemic uncertainty about what model would best fit the training data, but this may not correspond to clinically meaningful uncertainty about patient outcomes if all ensemble members share the same systematic biases or fail in the same ways for certain patient populations.
+However, deep ensembles also face limitations for equity applications. The computational cost scales linearly with ensemble size, requiring $$ M $$ times the training time and memory of a single model. Small ensembles may not capture sufficient diversity to provide reliable uncertainty estimates, while large ensembles become prohibitively expensive. Most critically, ensemble disagreement measures epistemic uncertainty about what model would best fit the training data, but this may not correspond to clinically meaningful uncertainty about patient outcomes if all ensemble members share the same systematic biases or fail in the same ways for certain patient populations.
 
 We must evaluate whether ensemble uncertainty actually provides useful information for identifying predictions requiring additional clinical scrutiny, particularly for underserved populations where we most need reliable uncertainty quantification to guard against algorithmic bias.
 

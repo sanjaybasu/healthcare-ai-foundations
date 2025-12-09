@@ -37,41 +37,41 @@ The clinical stakes of diagnostic AI are particularly high for underserved popul
 
 Diagnostic reasoning in clinical medicine fundamentally involves probabilistic inference: given observed data about a patient, what is the probability of various possible diagnoses? Bayes' theorem provides the mathematical foundation for this reasoning, expressing the posterior probability of a diagnosis given observed evidence. However, standard Bayesian approaches often fail to account for how disease prevalence, presentation patterns, and diagnostic accuracy vary across populations.
 
-The basic framework for diagnostic inference begins with Bayes' theorem applied to diagnosis. For a particular disease $D $ and observed clinical data $ X$, we compute the posterior probability:
+The basic framework for diagnostic inference begins with Bayes' theorem applied to diagnosis. For a particular disease $$D $$ and observed clinical data $$ X$$, we compute the posterior probability:
 
 $$
 P(D\mid X) = \frac{P(X \mid D) \cdot P(D)}{P(X)}
 $$
 
-where $P(D)$ represents the prior probability (disease prevalence), $ P(X\mid D)$ represents the likelihood (probability of observing the clinical data given the disease), and $ P(X)$ is the marginal likelihood serving as a normalization constant. For differential diagnosis involving multiple possible diseases $\{D_1, D_2, \ldots, D_K\}$, we compute posterior probabilities for each:
+where $$P(D)$$ represents the prior probability (disease prevalence), $$ P(X\mid D)$$ represents the likelihood (probability of observing the clinical data given the disease), and $$ P(X)$$ is the marginal likelihood serving as a normalization constant. For differential diagnosis involving multiple possible diseases $$\{D_1, D_2, \ldots, D_K\}$$, we compute posterior probabilities for each:
 
 $$
 P(D_k\mid X) = \frac{P(X \mid D_k) \cdot P(D_k)}{\sum_{j=1}^K P(X\mid D_j) \cdot P(D_j)}
 $$
 
-The critical equity issue arises when we recognize that both priors $P(D_k)$ and likelihoods $ P(X\mid D_k)$ can vary substantially across population groups. Let $ G$ represent demographic group membership (which might encode race, ethnicity, age, sex, socioeconomic status, or intersections thereof). The group-conditional diagnostic probability becomes:
+The critical equity issue arises when we recognize that both priors $$P(D_k)$$ and likelihoods $$ P(X\mid D_k)$$ can vary substantially across population groups. Let $$ G$$ represent demographic group membership (which might encode race, ethnicity, age, sex, socioeconomic status, or intersections thereof). The group-conditional diagnostic probability becomes:
 
 $$
 P(D_k\mid X, G) = \frac{P(X \mid D_k, G) \cdot P(D_k\mid G)}{\sum_{j=1}^K P(X \mid D_j, G) \cdot P(D_j\mid G)}
 $$
 
-This formulation reveals two distinct sources of population heterogeneity. First, disease prevalence varies across groups: $P(D_k\mid G_1) \neq P(D_k \mid G_2)$ for different groups $ G_1 $ and $ G_2 $. For example, sickle cell disease has dramatically different prevalence across racial and ethnic groups, while certain genetic variants affecting cardiovascular disease risk show strong population stratification. Second, disease presentation can differ: $ P(X\mid D_k, G_1) \neq P(X \mid D_k, G_2)$, meaning that the same disease may manifest with different symptoms, signs, or biomarker profiles across populations. Classic examples include the higher prevalence of silent myocardial infarction in diabetic patients and the different presentation patterns of autoimmune diseases across racial groups.
+This formulation reveals two distinct sources of population heterogeneity. First, disease prevalence varies across groups: $$P(D_k\mid G_1) \neq P(D_k \mid G_2)$$ for different groups $$ G_1 $$ and $$ G_2 $$. For example, sickle cell disease has dramatically different prevalence across racial and ethnic groups, while certain genetic variants affecting cardiovascular disease risk show strong population stratification. Second, disease presentation can differ: $$ P(X\mid D_k, G_1) \neq P(X \mid D_k, G_2)$$, meaning that the same disease may manifest with different symptoms, signs, or biomarker profiles across populations. Classic examples include the higher prevalence of silent myocardial infarction in diabetic patients and the different presentation patterns of autoimmune diseases across racial groups.
 
-A naive diagnostic AI system that ignores group membership $ G $ and uses population-average estimates $ P(D_k)$ and $ P(X\mid D_k)$ will systematically underperform for groups where true prevalence or presentation patterns differ from the population average. However, explicitly conditioning on group membership raises important ethical questions about when and how demographic information should enter diagnostic models. Three distinct approaches have been proposed in the literature.
+A naive diagnostic AI system that ignores group membership $$ G $$ and uses population-average estimates $$ P(D_k)$$ and $$ P(X\mid D_k)$$ will systematically underperform for groups where true prevalence or presentation patterns differ from the population average. However, explicitly conditioning on group membership raises important ethical questions about when and how demographic information should enter diagnostic models. Three distinct approaches have been proposed in the literature.
 
-The first approach, which we term population-stratified modeling, builds separate diagnostic models for different demographic groups, allowing all parameters to vary: $ f_G(X) \to P(D_k\mid X, G)$. This maximizes predictive accuracy by fully adapting to group-specific patterns but requires sufficient training data for each group and may reinforce essentialist views of demographic categories. The second approach, which we call prior-adjusted modeling, uses a shared diagnostic model for the likelihood $ P(X\mid D_k)$ but adjusts priors based on group membership: $ P(D_k\mid X, G) \propto P(X \mid D_k) \cdot P(D_k\mid G)$. This accounts for known prevalence differences while avoiding assumptions about differential presentation. The third approach, universalist modeling, aims to learn representations that are invariant to group membership while still achieving high diagnostic accuracy through careful feature engineering and fairness constraints.
+The first approach, which we term population-stratified modeling, builds separate diagnostic models for different demographic groups, allowing all parameters to vary: $$ f_G(X) \to P(D_k\mid X, G)$$. This maximizes predictive accuracy by fully adapting to group-specific patterns but requires sufficient training data for each group and may reinforce essentialist views of demographic categories. The second approach, which we call prior-adjusted modeling, uses a shared diagnostic model for the likelihood $$ P(X\mid D_k)$$ but adjusts priors based on group membership: $$ P(D_k\mid X, G) \propto P(X \mid D_k) \cdot P(D_k\mid G)$$. This accounts for known prevalence differences while avoiding assumptions about differential presentation. The third approach, universalist modeling, aims to learn representations that are invariant to group membership while still achieving high diagnostic accuracy through careful feature engineering and fairness constraints.
 
 Each approach has merits and limitations depending on the specific clinical context. For conditions where prevalence differences are well-established and presentation patterns are genuinely different across groups (for example, genetic diseases with strong population stratification), population-stratified or prior-adjusted approaches may be both more accurate and more equitable. For conditions where apparent group differences may primarily reflect social rather than biological factors, or where conditioning on demographics might perpetuate discriminatory practices, universalist approaches that learn invariant representations may be preferable. The key is to make these modeling choices explicitly and transparently, with careful consideration of both predictive performance and equity implications.
 
-Beyond population heterogeneity in disease characteristics, we must also account for systematic differences in data availability and quality across groups. Let $ M $ denote a missingness indicator, where $ M_i = 1 $ if feature $ i $ is observed and $ M_i = 0$ if missing. If missingness patterns are not missing completely at random (MCAR) but instead missing at random (MAR) or missing not at random (MNAR) in ways that correlate with group membership, diagnostic models must explicitly account for this. The observed likelihood becomes:
+Beyond population heterogeneity in disease characteristics, we must also account for systematic differences in data availability and quality across groups. Let $$ M $$ denote a missingness indicator, where $$ M_i = 1 $$ if feature $$ i $$ is observed and $$ M_i = 0$$ if missing. If missingness patterns are not missing completely at random (MCAR) but instead missing at random (MAR) or missing not at random (MNAR) in ways that correlate with group membership, diagnostic models must explicitly account for this. The observed likelihood becomes:
 
 $$
 P(X_{\text{obs}}\mid D_k, G, M) = \int P(X_{\text{obs}}, X_{\text{miss}} \mid D_k, G) \cdot P(M\mid X, D_k, G) dX_{\text{miss}}
 $$
 
-where $X_{\text{obs}}$ represents observed features and $ X_{\text{miss}}$ represents missing features. If certain diagnostic tests are systematically less available for some populations—for example, advanced imaging studies in rural areas or genetic testing in communities without nearby specialized centers—then models that implicitly assume complete data will perform poorly for groups with more missingness. Approaches for handling this include multiple imputation methods that account for missingness mechanisms, models that explicitly represent uncertainty over missing features, and fairness constraints that ensure predictions remain calibrated even when certain features are unavailable.
+where $$X_{\text{obs}}$$ represents observed features and $$ X_{\text{miss}}$$ represents missing features. If certain diagnostic tests are systematically less available for some populations—for example, advanced imaging studies in rural areas or genetic testing in communities without nearby specialized centers—then models that implicitly assume complete data will perform poorly for groups with more missingness. Approaches for handling this include multiple imputation methods that account for missingness mechanisms, models that explicitly represent uncertainty over missing features, and fairness constraints that ensure predictions remain calibrated even when certain features are unavailable.
 
-The evaluation of diagnostic AI systems also requires careful attention to equity considerations. Standard metrics like accuracy, sensitivity, and specificity can mask substantial disparities across groups. For a diagnostic task with true disease labels $ Y $ and model predictions $\hat{Y}$, we define group-conditional sensitivity and specificity:
+The evaluation of diagnostic AI systems also requires careful attention to equity considerations. Standard metrics like accuracy, sensitivity, and specificity can mask substantial disparities across groups. For a diagnostic task with true disease labels $$ Y $$ and model predictions $$\hat{Y}$$, we define group-conditional sensitivity and specificity:
 
 $$
 \text{Sensitivity}_G = P(\hat{Y} = 1 \mid Y = 1, G) \quad \text{Specificity}_G = P(\hat{Y} = 0 \mid Y = 0, G)
@@ -85,19 +85,19 @@ $$
 
 This fundamental relationship means that achieving equal PPV across groups with different disease prevalence requires different sensitivity-specificity tradeoffs, creating tension between different notions of fairness. The appropriate resolution depends on the clinical context: for screening tests where false positives carry significant burden (for example, unnecessary biopsies), equal PPV may be more important; for diagnostic tests where missing true positives has severe consequences (for example, sepsis detection), equal sensitivity may be paramount.
 
-A comprehensive fairness evaluation framework for diagnostic AI must assess multiple metrics simultaneously and examine their distribution across relevant demographic groups. We define a fairness audit that computes, for each group $G$ and at various operating points (thresholds):
+A comprehensive fairness evaluation framework for diagnostic AI must assess multiple metrics simultaneously and examine their distribution across relevant demographic groups. We define a fairness audit that computes, for each group $$G$$ and at various operating points (thresholds):
 
 $$
 \mathcal{F}(G) = \{\text{Sensitivity}_G(\tau), \text{Specificity}_G(\tau), \text{PPV}_G(\tau), \text{NPV}_G(\tau), \text{AUC}_G, \text{Calibration}_G\}
 $$
 
-where $\tau $ represents different classification thresholds. Calibration is particularly important, as it measures whether predicted probabilities match true outcome frequencies: a well-calibrated model with $ P(\hat{Y}=1\mid X,G) = 0.7$ should have approximately seventy percent of patients with that prediction actually having the disease. Poor calibration can lead to misplaced clinical confidence in predictions, with particularly severe consequences when it systematically differs across groups. We measure calibration through the expected calibration error:
+where $$\tau $$ represents different classification thresholds. Calibration is particularly important, as it measures whether predicted probabilities match true outcome frequencies: a well-calibrated model with $$ P(\hat{Y}=1\mid X,G) = 0.7$$ should have approximately seventy percent of patients with that prediction actually having the disease. Poor calibration can lead to misplaced clinical confidence in predictions, with particularly severe consequences when it systematically differs across groups. We measure calibration through the expected calibration error:
 
 $$
 \text{ECE}_G = \sum_{b=1}^B \frac{\lvert G_b \rvert}{\lvert G \rvert} \left\lvert \frac{1}{ \rvert G_b\lvert } \sum_{i \in G_b} y_i - \frac{1}{ \rvert G_b\lvert } \sum_{i \in G_b} \hat{p}_i \right \rvert
 $$
 
-where $G_b $ represents samples in group $ G $ falling into the $ b $-th probability bin, $ y_i $ is the true label, and $\hat{p}_i $ is the predicted probability.
+where $$G_b $$ represents samples in group $$ G $$ falling into the $$ b $$-th probability bin, $$ y_i $$ is the true label, and $$\hat{p}_i $$ is the predicted probability.
 
 ## Clinical Presentation and Differential Diagnosis Generation
 
@@ -105,13 +105,13 @@ The generation of differential diagnoses from clinical presentations represents 
 
 Traditional approaches to differential diagnosis generation have relied on rule-based expert systems encoding clinical knowledge about disease presentations. Modern neural approaches instead learn latent representations of clinical presentations and diseases from large datasets of electronic health records, mapping from presenting features to probability distributions over possible diagnoses. The challenge lies in ensuring these learned representations capture genuine clinical relationships rather than spurious correlations or historical biases.
 
-A neural differential diagnosis system typically consists of an encoder that maps clinical presentation $ X $ (symptoms, vital signs, initial lab results) to a latent representation $ h = f_{\text{enc}}(X)$, followed by a decoder that maps from the latent space to a probability distribution over diseases: $ P(D_1, \ldots, D_K\mid X) = \text{softmax}(W h + b)$ where $ W $ and $ b$ are learned parameters. Attention mechanisms allow the model to identify which clinical features are most relevant for each diagnostic consideration:
+A neural differential diagnosis system typically consists of an encoder that maps clinical presentation $$ X $$ (symptoms, vital signs, initial lab results) to a latent representation $$ h = f_{\text{enc}}(X)$$, followed by a decoder that maps from the latent space to a probability distribution over diseases: $$ P(D_1, \ldots, D_K\mid X) = \text{softmax}(W h + b)$$ where $$ W $$ and $$ b$$ are learned parameters. Attention mechanisms allow the model to identify which clinical features are most relevant for each diagnostic consideration:
 
 $$
 \alpha_{k,i} = \frac{\exp(e_{k,i})}{\sum_{j=1}^n \exp(e_{k,j})} \quad \text{where} \quad e_{k,i} = v_k^T \tanh(W_1 h_i + W_2 h_k)
 $$
 
-Here $\alpha_{k,i}$ represents the attention weight from disease $ k $ to clinical feature $ i$, allowing interpretation of which features drive each diagnostic consideration. This interpretability is crucial for clinical adoption and for detecting potential biases, for example, if the model systematically attends to different features for patients from different demographic groups in ways not justified by clinical knowledge.
+Here $$\alpha_{k,i}$$ represents the attention weight from disease $$ k $$ to clinical feature $$ i$$, allowing interpretation of which features drive each diagnostic consideration. This interpretability is crucial for clinical adoption and for detecting potential biases, for example, if the model systematically attends to different features for patients from different demographic groups in ways not justified by clinical knowledge.
 
 Equity considerations in differential diagnosis systems require addressing both representation bias in training data and population heterogeneity in disease characteristics. Electronic health record data used for training reflects the patient population seen at particular healthcare systems, which may systematically underrepresent certain racial and ethnic minorities, rural populations, uninsured patients, and other marginalized groups. When a differential diagnosis model is then deployed in a more diverse population or different clinical setting, its performance may degrade for underrepresented groups. This is not simply a matter of having fewer training examples from certain groups, but rather that the feature-disease relationships learned from the training population may not generalize.
 
@@ -121,9 +121,9 @@ $$
 \mathcal{L} = \mathcal{L}_{\text{CE}} + \lambda \sum_{g=1}^G \left(\text{AUC}_g - \overline{\text{AUC}}\right)^2
 $$
 
-where $\mathcal{L}_{\text{CE}}$ is the standard cross-entropy loss, $\text{AUC}_g$ is the area under the ROC curve for group $g$, and $\overline{\text{AUC}}$ is the average AUC across all groups. This penalty encourages the model to maintain diagnostic accuracy across populations rather than optimizing for average performance.
+where $$\mathcal{L}_{\text{CE}}$$ is the standard cross-entropy loss, $$\text{AUC}_g$$ is the area under the ROC curve for group $$g$$, and $$\overline{\text{AUC}}$$ is the average AUC across all groups. This penalty encourages the model to maintain diagnostic accuracy across populations rather than optimizing for average performance.
 
-Second, we incorporate disease prevalence adjustment that allows the system to adapt to different patient populations. Given population-specific prevalence estimates $ P(D_k\mid G)$, we adjust the model's output probabilities:
+Second, we incorporate disease prevalence adjustment that allows the system to adapt to different patient populations. Given population-specific prevalence estimates $$ P(D_k\mid G)$$, we adjust the model's output probabilities:
 
 $$
 P_{\text{adj}}(D_k\lvert X, G) = \frac{P_{\text{model}}(D_k \mid X) \cdot \frac{P(D_k\mid G)}{P(D_k)}}{\sum_{j=1}^K P_{\text{model}}(D_j \mid X) \cdot \frac{P(D_j\mid G)}{P(D_j)}}
@@ -137,7 +137,7 @@ $$
 P(D_k\mid X) = \int P(D_k \mid X, \theta) P(\theta\lvert \mathcal{D}) d\theta \approx \frac{1}{M} \sum_{m=1}^M P(D_k \mid X, \theta^{(m)})
 $$
 
-where $\theta $ represents model parameters, $\mathcal{D}$ is the training data, and $\theta^{(m)}$ are samples from the posterior distribution over parameters. High uncertainty signals that the model should defer to human clinical judgment rather than providing potentially unreliable predictions.
+where $$\theta $$ represents model parameters, $$\mathcal{D}$$ is the training data, and $$\theta^{(m)}$$ are samples from the posterior distribution over parameters. High uncertainty signals that the model should defer to human clinical judgment rather than providing potentially unreliable predictions.
 
 Here is a production-ready implementation of a population-aware differential diagnosis system:
 

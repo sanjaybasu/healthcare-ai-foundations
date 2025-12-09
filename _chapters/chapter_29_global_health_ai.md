@@ -60,7 +60,7 @@ $$
 \mathcal{L}_{distill} = \alpha \mathcal{L}_{CE}(y, f_{student}(x)) + (1-\alpha) \mathcal{L}_{KL}(f_{teacher}(x), f_{student}(x))
 $$
 
-where $\mathcal{L}_{CE}$ is cross-entropy loss between predictions and true labels, $\mathcal{L}_{KL}$ is Kullback-Leibler divergence between teacher and student prediction distributions, and $\alpha$ weights the relative importance of these objectives. The temperature parameter in the softmax function for both teacher and student is often increased during distillation to create softer probability distributions that convey more information about the teacher's uncertainty.
+where $$\mathcal{L}_{CE}$$ is cross-entropy loss between predictions and true labels, $$\mathcal{L}_{KL}$$ is Kullback-Leibler divergence between teacher and student prediction distributions, and $$\alpha$$ weights the relative importance of these objectives. The temperature parameter in the softmax function for both teacher and student is often increased during distillation to create softer probability distributions that convey more information about the teacher's uncertainty.
 
 **Quantization** reduces model size and inference time by representing weights and activations with lower precision. Standard deep learning uses 32-bit floating-point numbers, but many models maintain acceptable performance with 16-bit, 8-bit, or even binary representations. This dramatically reduces memory requirements and speeds inference on hardware supporting low-precision operations.
 
@@ -1609,13 +1609,13 @@ Understanding the specific sources of domain shift between training and deployme
 
 **Covariate shift** occurs when the input distribution differs between source and target domains while the conditional distribution of outcomes given inputs remains consistent. In global health, this manifests as differences in patient demographics, disease prevalence, and clinical presentation. A model trained on elderly patients in the US encounters much younger populations in sub-Saharan Africa. A tuberculosis detection system trained in low-prevalence settings faces much higher base rates in high-prevalence regions.
 
-Under covariate shift, the conditional probability $ P(Y\mid X)$ remains constant but the marginal distribution $ P(X)$ changes: $ P_{source}(X) \neq P_{target}(X)$ while $ P_{source}(Y\mid X) = P_{target}(Y \mid X)$. This means the relationship between clinical features and outcomes is consistent, but the distribution of features differs. Addressing covariate shift often involves importance weighting or domain adversarial training.
+Under covariate shift, the conditional probability $$ P(Y\mid X)$$ remains constant but the marginal distribution $$ P(X)$$ changes: $$ P_{source}(X) \neq P_{target}(X)$$ while $$ P_{source}(Y\mid X) = P_{target}(Y \mid X)$$. This means the relationship between clinical features and outcomes is consistent, but the distribution of features differs. Addressing covariate shift often involves importance weighting or domain adversarial training.
 
 **Label shift** (or prior probability shift) occurs when the distribution of outcomes changes while the conditional distribution of inputs given outcomes remains consistent. In global health, this manifests as dramatically different disease prevalence. The probability of tuberculosis given a certain set of symptoms and chest X-ray findings may be similar across settings, but the baseline probability of tuberculosis differs dramatically.
 
-Under label shift: $ P_{source}(Y) \neq P_{target}(Y)$ while $ P_{source}(X\mid Y) = P_{target}(X \mid Y)$. Bayes' rule shows that when label shift occurs, we can reweight predictions based on the ratio of target to source label probabilities. If we know disease prevalence in both training and deployment settings, we can recalibrate model outputs accordingly.
+Under label shift: $$ P_{source}(Y) \neq P_{target}(Y)$$ while $$ P_{source}(X\mid Y) = P_{target}(X \mid Y)$$. Bayes' rule shows that when label shift occurs, we can reweight predictions based on the ratio of target to source label probabilities. If we know disease prevalence in both training and deployment settings, we can recalibrate model outputs accordingly.
 
-**Concept shift** represents the most challenging case where the actual relationship between inputs and outputs differs across domains: $ P_{source}(Y\mid X) \neq P_{target}(Y \mid X)$. In global health, this occurs when the same clinical presentation predicts different outcomes due to systematic differences in populations or healthcare systems. A given set of vital signs might indicate higher risk in settings with limited treatment capacity. Co-morbidity patterns differ substantially between settings, changing how clinical features should be interpreted.
+**Concept shift** represents the most challenging case where the actual relationship between inputs and outputs differs across domains: $$ P_{source}(Y\mid X) \neq P_{target}(Y \mid X)$$. In global health, this occurs when the same clinical presentation predicts different outcomes due to systematic differences in populations or healthcare systems. A given set of vital signs might indicate higher risk in settings with limited treatment capacity. Co-morbidity patterns differ substantially between settings, changing how clinical features should be interpreted.
 
 Concept shift often cannot be addressed without target domain labeled data for retraining or fine-tuning. Detecting concept shift is critical—deploying models under false assumptions of consistent relationships across settings creates substantial clinical risk.
 
@@ -2769,11 +2769,11 @@ Federated learning enables collaborative model training without sharing raw data
 
 The standard federated learning protocol proceeds iteratively:
 
-1. A central server initializes a global model $\theta^{(0)}$
-2. The server distributes the current global model $\theta^{(t)}$ to participating clients
-3. Each client $ k $ trains the model on their local data for several iterations, computing updated parameters $\theta_k^{(t+1)}$
-4. Clients send model updates $\Delta\theta_k = \theta_k^{(t+1)} - \theta^{(t)}$ to the server
-5. The server aggregates updates to create an improved global model $\theta^{(t+1)}$
+1. A central server initializes a global model $$\theta^{(0)}$$
+2. The server distributes the current global model $$\theta^{(t)}$$ to participating clients
+3. Each client $$ k $$ trains the model on their local data for several iterations, computing updated parameters $$\theta_k^{(t+1)}$$
+4. Clients send model updates $$\Delta\theta_k = \theta_k^{(t+1)} - \theta^{(t)}$$ to the server
+5. The server aggregates updates to create an improved global model $$\theta^{(t+1)}$$
 
 The most common aggregation strategy is Federated Averaging (FedAvg), which weights each client's contribution by their dataset size:
 
@@ -2781,7 +2781,7 @@ $$
 \theta^{(t+1)} = \theta^{(t)} + \sum_{k=1}^K \frac{n_k}{n} \Delta\theta_k
 $$
 
-where $n_k $ is the number of samples at client $ k $ and $ n = \sum_k n_k$ is the total.
+where $$n_k $$ is the number of samples at client $$ k $$ and $$ n = \sum_k n_k$$ is the total.
 
 For global health applications, participating clients might be hospitals in different countries, health ministries, or regional health systems. Each maintains complete control over their data while contributing to model improvement.
 

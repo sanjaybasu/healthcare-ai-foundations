@@ -40,7 +40,7 @@ The technical approaches developed here build directly on concepts from previous
 
 ## 5.2 Neural Network Fundamentals with Fairness Considerations
 
-Neural networks approximate complex functions through compositions of simple nonlinear transformations. A feedforward neural network with $L$ layers computes output $\hat{y}$ from input $\mathbf{x}$ through successive transformations:
+Neural networks approximate complex functions through compositions of simple nonlinear transformations. A feedforward neural network with $$L$$ layers computes output $$\hat{y}$$ from input $$\mathbf{x}$$ through successive transformations:
 
 $$\mathbf{h}^{(0)} = \mathbf{x}$$
 
@@ -48,19 +48,19 @@ $$\mathbf{h}^{(l)} = f^{(l)}\left(\mathbf{W}^{(l)} \mathbf{h}^{(l-1)} + \mathbf{
 
 $$\hat{y} = \mathbf{W}^{(L)} \mathbf{h}^{(L-1)} + \mathbf{b}^{(L)}$$
 
-where $\mathbf{W}^{(l)}$ and $\mathbf{b}^{(l)}$ are weight matrices and bias vectors for layer $l$, and $f^{(l)}$ are elementwise nonlinear activation functions. Common activation functions include the rectified linear unit $f(z) = \max(0, z)$, which introduces nonlinearity while preserving gradient flow for positive activations, and the sigmoid $f(z) = 1/(1 + e^{-z})$, which constrains outputs to $(0, 1)$. The choice of final layer activation depends on the task: sigmoid for binary classification, softmax for multi-class problems, and linear (identity) for regression.
+where $$\mathbf{W}^{(l)}$$ and $$\mathbf{b}^{(l)}$$ are weight matrices and bias vectors for layer $$l$$, and $$f^{(l)}$$ are elementwise nonlinear activation functions. Common activation functions include the rectified linear unit $$f(z) = \max(0, z)$$, which introduces nonlinearity while preserving gradient flow for positive activations, and the sigmoid $$f(z) = 1/(1 + e^{-z})$$, which constrains outputs to $$(0, 1)$$. The choice of final layer activation depends on the task: sigmoid for binary classification, softmax for multi-class problems, and linear (identity) for regression.
 
 Training neural networks minimizes an objective function measuring prediction error on training data. For classification with cross-entropy loss:
 
 $$\mathcal{L}(\theta) = -\frac{1}{n} \sum_{i=1}^n \left[ y_i \log \hat{y}_i + (1-y_i) \log (1-\hat{y}_i) \right]$$
 
-where $\theta$ represents all network parameters $\{\mathbf{W}^{(l)}, \mathbf{b}^{(l)}\}_{l=1}^L$. Optimization proceeds via gradient descent, computing parameter updates $\theta \leftarrow \theta - \eta \nabla_\theta \mathcal{L}$ where $\eta$ is the learning rate. For deep networks with many layers, gradients are computed efficiently through backpropagation, which applies the chain rule recursively from output to input:
+where $$\theta$$ represents all network parameters $$\{\mathbf{W}^{(l)}, \mathbf{b}^{(l)}\}_{l=1}^L$$. Optimization proceeds via gradient descent, computing parameter updates $$\theta \leftarrow \theta - \eta \nabla_\theta \mathcal{L}$$ where $$\eta$$ is the learning rate. For deep networks with many layers, gradients are computed efficiently through backpropagation, which applies the chain rule recursively from output to input:
 
 $$\frac{\partial \mathcal{L}}{\partial \mathbf{W}^{(l)}} = \frac{\partial \mathcal{L}}{\partial \mathbf{h}^{(l)}} \frac{\partial \mathbf{h}^{(l)}}{\partial \mathbf{W}^{(l)}}$$
 
 Modern optimization employs adaptive learning rate methods including Adam, which maintains running averages of gradients and their squares to adaptively scale parameter updates, and stochastic gradient descent variants that update parameters on mini-batches rather than the full dataset.
 
-From a fairness perspective, several aspects of neural network training affect how models generalize across demographic groups. The capacity of the network—determined by width (neurons per layer) and depth (number of layers)—controls how complex a function it can represent. Insufficient capacity forces the model to ignore subtle patterns that may be critical for underrepresented groups. Excessive capacity risks overfitting, memorizing training data patterns including spurious correlations between features and demographics. Regularization techniques including weight decay, which penalizes large parameter values by adding $\lambda \sum_l \|\mathbf{W}^{(l)}\|^2$ to the objective, and dropout, which randomly zeroes activations during training to prevent co-adaptation, help balance these concerns.
+From a fairness perspective, several aspects of neural network training affect how models generalize across demographic groups. The capacity of the network—determined by width (neurons per layer) and depth (number of layers)—controls how complex a function it can represent. Insufficient capacity forces the model to ignore subtle patterns that may be critical for underrepresented groups. Excessive capacity risks overfitting, memorizing training data patterns including spurious correlations between features and demographics. Regularization techniques including weight decay, which penalizes large parameter values by adding $$\lambda \sum_l \|\mathbf{W}^{(l)}\|^2$$ to the objective, and dropout, which randomly zeroes activations during training to prevent co-adaptation, help balance these concerns.
 
 The training data distribution fundamentally determines what patterns the network learns. When certain demographic groups are underrepresented, standard empirical risk minimization achieves lower loss on majority groups at the expense of minority group performance. This occurs because gradient descent makes parameter updates proportional to the gradient of average loss across training examples. With imbalanced data, gradients for majority examples dominate, driving the model toward representations that work well for the majority while potentially failing for minorities.
 
@@ -68,17 +68,17 @@ Batch normalization, a technique that normalizes layer activations to have zero 
 
 ### 5.2.1 Fairness-Aware Training Objectives
 
-To ensure neural networks perform equitably across demographic groups, we modify standard training objectives to explicitly penalize disparate performance. One approach incorporates fairness constraints directly into the optimization problem. Given sensitive attribute $A$ (e.g., race, ethnicity, language), we seek parameters $\theta$ that minimize prediction loss while constraining performance disparities:
+To ensure neural networks perform equitably across demographic groups, we modify standard training objectives to explicitly penalize disparate performance. One approach incorporates fairness constraints directly into the optimization problem. Given sensitive attribute $$A$$ (e.g., race, ethnicity, language), we seek parameters $$\theta$$ that minimize prediction loss while constraining performance disparities:
 
 $$\min_\theta \mathcal{L}(\theta) \quad \text{subject to} \quad \max_{a, a'} \Bigl\lvert\text{Perf}(\theta; A=a) - \text{Perf}(\theta; A=a')\Bigr\rvert \leq \epsilon$$
 
-where $\text{Perf}(\theta; A=a)$ measures model performance (e.g., AUC, accuracy) on the subgroup with $A=a$, and $\epsilon$ is an acceptable performance gap threshold.
+where $$\text{Perf}(\theta; A=a)$$ measures model performance (e.g., AUC, accuracy) on the subgroup with $$A=a$$, and $$\epsilon$$ is an acceptable performance gap threshold.
 
 This constrained optimization problem can be solved through Lagrangian relaxation, converting the constraint into a penalty term:
 
 $$\mathcal{L}_{\text{fair}}(\theta) = \mathcal{L}(\theta) + \lambda \max_{a, a'} \Bigl\lvert\text{Perf}(\theta; A=a) - \text{Perf}(\theta; A=a')\Bigr\rvert$$
 
-where $\lambda$ controls the fairness-accuracy tradeoff. Increasing $\lambda$ enforces tighter performance parity at potential cost to overall accuracy.
+where $$\lambda$$ controls the fairness-accuracy tradeoff. Increasing $$\lambda$$ enforces tighter performance parity at potential cost to overall accuracy.
 
 An alternative fairness-aware objective minimizes worst-group loss:
 
@@ -88,13 +88,13 @@ This distributionally robust optimization approach explicitly optimizes for the 
 
 $$\mathcal{L}_{\text{reweighted}}(\theta) = \sum_a w_a \mathcal{L}(\theta; A=a)$$
 
-where weights $w_a$ are set proportional to group-specific losses, upweighting underperforming groups during training.
+where weights $$w_a$$ are set proportional to group-specific losses, upweighting underperforming groups during training.
 
-A third approach enforces fairness through representation learning. Rather than constraining performance directly, we train neural networks to learn representations that cannot predict sensitive attributes. An adversarial network attempts to predict sensitive attribute $A$ from learned representations $\mathbf{h}^{(l)}$:
+A third approach enforces fairness through representation learning. Rather than constraining performance directly, we train neural networks to learn representations that cannot predict sensitive attributes. An adversarial network attempts to predict sensitive attribute $$A$$ from learned representations $$\mathbf{h}^{(l)}$$:
 
 $$\min_{\theta} \max_{\phi} \mathcal{L}_{\text{pred}}(\theta) - \lambda \mathcal{L}_{\text{adv}}(\phi, \theta)$$
 
-where $\mathcal{L}_{\text{pred}}$ measures prediction accuracy on the primary task, $\mathcal{L}_{\text{adv}}$ measures the adversary's ability to predict sensitive attributes from representations, and $\lambda$ controls the strength of fairness enforcement. This adversarial training encourages representations that contain information relevant for prediction but are statistically independent of protected attributes.
+where $$\mathcal{L}_{\text{pred}}$$ measures prediction accuracy on the primary task, $$\mathcal{L}_{\text{adv}}$$ measures the adversary's ability to predict sensitive attributes from representations, and $$\lambda$$ controls the strength of fairness enforcement. This adversarial training encourages representations that contain information relevant for prediction but are statistically independent of protected attributes.
 
 ### 5.2.2 Production Implementation: Fair Neural Network Framework
 
@@ -1269,19 +1269,19 @@ Convolutional neural networks exploit the spatial structure of images through op
 
 $$h^{(l)}_{i,j,k} = f\left(\sum_{a=-r}^{r} \sum_{b=-r}^{r} \sum_{c=1}^{C_{l-1}} W^{(l)}_{a,b,c,k} \cdot h^{(l-1)}_{i+a,j+b,c} + b^{(l)}_k\right)$$
 
-where $h^{(l)}_{i,j,k}$ is the activation at spatial position $(i,j)$ and channel $k$ in layer $l$, $W^{(l)}$ is the convolutional kernel of size $(2r+1) \times (2r+1)$, $C_{l-1}$ is the number of input channels, and $f$ is a nonlinear activation function. This convolution operation is translation equivariant: shifting the input shifts the output correspondingly.
+where $$h^{(l)}_{i,j,k}$$ is the activation at spatial position $$(i,j)$$ and channel $$k$$ in layer $$l$$, $$W^{(l)}$$ is the convolutional kernel of size $$(2r+1) \times (2r+1)$$, $$C_{l-1}$$ is the number of input channels, and $$f$$ is a nonlinear activation function. This convolution operation is translation equivariant: shifting the input shifts the output correspondingly.
 
 Pooling layers reduce spatial dimensions while providing local translation invariance. Max pooling computes:
 
 $$h^{(\text{pool})}_{i,j,k} = \max_{(a,b) \in \mathcal{N}(i,j)} h_{a,b,k}$$
 
-over a local neighborhood $\mathcal{N}(i,j)$, typically $2 \times 2$ or $3 \times 3$ windows. This downsampling reduces computational requirements for subsequent layers while building hierarchical representations that capture increasingly abstract visual concepts.
+over a local neighborhood $$\mathcal{N}(i,j)$$, typically $$2 \times 2$$ or $$3 \times 3$$ windows. This downsampling reduces computational requirements for subsequent layers while building hierarchical representations that capture increasingly abstract visual concepts.
 
 Modern medical imaging CNNs often employ residual connections that enable training very deep networks:
 
 $$\mathbf{h}^{(l+1)} = \mathbf{h}^{(l)} + \mathcal{F}(\mathbf{h}^{(l)}; \mathbf{W}^{(l)})$$
 
-where $\mathcal{F}$ represents a stack of convolutional layers. These skip connections allow gradients to flow directly through the network during backpropagation, mitigating vanishing gradient problems that plague very deep architectures. Residual networks with 50, 101, or even 152 layers have become standard for medical image analysis, learning hierarchical features from edges and textures in early layers to complex anatomical structures and pathological patterns in deeper layers.
+where $$\mathcal{F}$$ represents a stack of convolutional layers. These skip connections allow gradients to flow directly through the network during backpropagation, mitigating vanishing gradient problems that plague very deep architectures. Residual networks with 50, 101, or even 152 layers have become standard for medical image analysis, learning hierarchical features from edges and textures in early layers to complex anatomical structures and pathological patterns in deeper layers.
 
 Attention mechanisms enhance CNNs by enabling networks to focus on diagnostically relevant image regions. Squeeze-and-excitation blocks recalibrate channel-wise feature responses:
 
@@ -1289,7 +1289,7 @@ $$\mathbf{z} = \mathbf{W}_2 \sigma(\mathbf{W}_1 \text{GlobalAvgPool}(\mathbf{h})
 
 $$\tilde{\mathbf{h}}_k = z_k \cdot \mathbf{h}_k$$
 
-where $\text{GlobalAvgPool}$ computes spatial averages for each channel, $\mathbf{W}_1$ and $\mathbf{W}_2$ are learned weights, $\sigma$ is a sigmoid activation, and $z_k$ represents the learned attention weight for channel $k$. This mechanism allows the network to emphasize informative features while suppressing less relevant ones, improving both performance and interpretability.
+where $$\text{GlobalAvgPool}$$ computes spatial averages for each channel, $$\mathbf{W}_1$$ and $$\mathbf{W}_2$$ are learned weights, $$\sigma$$ is a sigmoid activation, and $$z_k$$ represents the learned attention weight for channel $$k$$. This mechanism allows the network to emphasize informative features while suppressing less relevant ones, improving both performance and interpretability.
 
 ### 5.3.2 Equity Considerations in Medical Imaging CNNs
 
@@ -1315,7 +1315,7 @@ Domain adaptation techniques explicitly address distribution shifts between sour
 
 $$\min_\theta \max_\phi \mathcal{L}_{\text{task}}(\theta) - \lambda \mathcal{L}_{\text{domain}}(\phi, \theta)$$
 
-where $\mathcal{L}_{\text{task}}$ measures task performance, $\mathcal{L}_{\text{domain}}$ measures an adversary's ability to predict which domain an image comes from based on learned representations, and $\lambda$ controls the tradeoff. This objective encourages representations that are informative for diagnosis but indistinguishable across imaging equipment types, acquisition protocols, or care settings. By learning domain-invariant features, CNNs can generalize more equitably across diverse clinical environments.
+where $$\mathcal{L}_{\text{task}}$$ measures task performance, $$\mathcal{L}_{\text{domain}}$$ measures an adversary's ability to predict which domain an image comes from based on learned representations, and $$\lambda$$ controls the tradeoff. This objective encourages representations that are informative for diagnosis but indistinguishable across imaging equipment types, acquisition protocols, or care settings. By learning domain-invariant features, CNNs can generalize more equitably across diverse clinical environments.
 
 ### 5.3.4 Production Implementation: Medical Imaging CNN with Fairness Evaluation
 
@@ -2126,11 +2126,11 @@ Clinical data fundamentally involves sequences: vital signs sampled over time, l
 
 ### 5.4.1 Recurrent Neural Networks for Clinical Time Series
 
-Recurrent neural networks process sequences by maintaining hidden states that evolve as new observations arrive. At each time step $t$, an RNN updates its hidden state based on the current input and previous hidden state:
+Recurrent neural networks process sequences by maintaining hidden states that evolve as new observations arrive. At each time step $$t$$, an RNN updates its hidden state based on the current input and previous hidden state:
 
 $$\mathbf{h}_t = f(\mathbf{W}_{hh} \mathbf{h}_{t-1} + \mathbf{W}_{xh} \mathbf{x}_t + \mathbf{b}_h)$$
 
-where $\mathbf{h}_t$ is the hidden state at time $t$, $\mathbf{x}_t$ is the input, $\mathbf{W}_{hh}$ and $\mathbf{W}_{xh}$ are weight matrices, $\mathbf{b}_h$ is a bias vector, and $f$ is a nonlinear activation. For prediction tasks, an output layer maps from hidden states to predictions:
+where $$\mathbf{h}_t$$ is the hidden state at time $$t$$, $$\mathbf{x}_t$$ is the input, $$\mathbf{W}_{hh}$$ and $$\mathbf{W}_{xh}$$ are weight matrices, $$\mathbf{b}_h$$ is a bias vector, and $$f$$ is a nonlinear activation. For prediction tasks, an output layer maps from hidden states to predictions:
 
 $$\hat{\mathbf{y}}_t = \mathbf{W}_{hy} \mathbf{h}_t + \mathbf{b}_y$$
 
@@ -2148,7 +2148,7 @@ $$\mathbf{o}_t = \sigma(\mathbf{W}_{o} [\mathbf{h}_{t-1}, \mathbf{x}_t] + \mathb
 
 $$\mathbf{h}_t = \mathbf{o}_t \odot \tanh(\mathbf{c}_t)$$
 
-where $\mathbf{f}_t$, $\mathbf{i}_t$, and $\mathbf{o}_t$ are forget, input, and output gates respectively, $\mathbf{c}_t$ is the cell state, $\sigma$ is the sigmoid function, and $\odot$ denotes elementwise multiplication. These gates enable LSTMs to selectively retain or discard information over long sequences, capturing dependencies spanning hundreds of time steps.
+where $$\mathbf{f}_t$$, $$\mathbf{i}_t$$, and $$\mathbf{o}_t$$ are forget, input, and output gates respectively, $$\mathbf{c}_t$$ is the cell state, $$\sigma$$ is the sigmoid function, and $$\odot$$ denotes elementwise multiplication. These gates enable LSTMs to selectively retain or discard information over long sequences, capturing dependencies spanning hundreds of time steps.
 
 Gated Recurrent Units (GRUs) simplify the LSTM architecture while maintaining similar expressiveness:
 
@@ -2160,7 +2160,7 @@ $$\tilde{\mathbf{h}}_t = \tanh(\mathbf{W} [\mathbf{r}_t \odot \mathbf{h}_{t-1}, 
 
 $$\mathbf{h}_t = (1 - \mathbf{z}_t) \odot \mathbf{h}_{t-1} + \mathbf{z}_t \odot \tilde{\mathbf{h}}_t$$
 
-where $\mathbf{z}_t$ is an update gate and $\mathbf{r}_t$ is a reset gate. GRUs often match LSTM performance with fewer parameters and faster training.
+where $$\mathbf{z}_t$$ is an update gate and $$\mathbf{r}_t$$ is a reset gate. GRUs often match LSTM performance with fewer parameters and faster training.
 
 ### 5.4.2 Transformer Architectures for Clinical Data
 
@@ -2168,11 +2168,11 @@ Transformers process entire sequences in parallel using self-attention mechanism
 
 $$\text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}}\right) \mathbf{V}$$
 
-where queries $\mathbf{Q}$, keys $\mathbf{K}$, and values $\mathbf{V}$ are linear projections of input embeddings, and $d_k$ is the key dimension. Multi-head attention applies multiple attention operations in parallel:
+where queries $$\mathbf{Q}$$, keys $$\mathbf{K}$$, and values $$\mathbf{V}$$ are linear projections of input embeddings, and $$d_k$$ is the key dimension. Multi-head attention applies multiple attention operations in parallel:
 
 $$\text{MultiHead}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h) \mathbf{W}^O$$
 
-where $\text{head}_i = \text{Attention}(\mathbf{Q}\mathbf{W}_i^Q, \mathbf{K}\mathbf{W}_i^K, \mathbf{V}\mathbf{W}_i^V)$ and $\mathbf{W}^O$ is an output projection matrix.
+where $$\text{head}_i = \text{Attention}(\mathbf{Q}\mathbf{W}_i^Q, \mathbf{K}\mathbf{W}_i^K, \mathbf{V}\mathbf{W}_i^V)$$ and $$\mathbf{W}^O$$ is an output projection matrix.
 
 For clinical sequences, transformers offer several advantages over RNNs. They process entire sequences in parallel rather than sequentially, enabling faster training on modern hardware. Self-attention directly models long-range dependencies without information passing through intermediate states. Attention weights provide interpretability by revealing which time points the model considers relevant for prediction. These properties make transformers particularly effective for irregular clinical time series where observations occur at varying intervals.
 
@@ -2184,13 +2184,13 @@ Several approaches address irregular sampling directly. Time-aware LSTMs incorpo
 
 $$\mathbf{c}_t = \mathbf{f}_t \odot \mathbf{c}_{t-1} \cdot \exp(-\gamma \Delta t) + \mathbf{i}_t \odot \tilde{\mathbf{c}}_t$$
 
-where $\Delta t$ is the time interval since the previous observation and $\gamma$ is a learned decay rate. This allows the model to adjust its memory based on elapsed time, downweighting older observations appropriately.
+where $$\Delta t$$ is the time interval since the previous observation and $$\gamma$$ is a learned decay rate. This allows the model to adjust its memory based on elapsed time, downweighting older observations appropriately.
 
 Temporal point processes model the probability of observations occurring at specific times in addition to their values. Neural point processes use RNNs to parameterize conditional intensity functions:
 
 $$\lambda^*(t) = f(\mathbf{h}_t; \theta)$$
 
-where $\lambda^*(t)$ represents the instantaneous rate of events at time $t$ and $\mathbf{h}_t$ is the RNN hidden state encoding history up to time $t$. This joint modeling of observation times and values can improve predictions, particularly when observation patterns themselves carry information about patient state.
+where $$\lambda^*(t)$$ represents the instantaneous rate of events at time $$t$$ and $$\mathbf{h}_t$$ is the RNN hidden state encoding history up to time $$t$$. This joint modeling of observation times and values can improve predictions, particularly when observation patterns themselves carry information about patient state.
 
 Transformers naturally handle irregular sampling when positional encodings include actual timestamps rather than sequence positions. Time-aware positional encodings might compute:
 
@@ -2198,7 +2198,7 @@ $$\text{PE}(t, 2i) = \sin(t / 10000^{2i/d})$$
 
 $$\text{PE}(t, 2i+1) = \cos(t / 10000^{2i/d})$$
 
-where $t$ is the actual timestamp and $d$ is the embedding dimension. This encoding allows the transformer to understand temporal relationships regardless of sampling irregularity.
+where $$t$$ is the actual timestamp and $$d$$ is the embedding dimension. This encoding allows the transformer to understand temporal relationships regardless of sampling irregularity.
 
 From an equity perspective, approaches that handle irregular sampling explicitly are preferable to imputation-based methods. Imputation assumes missing data are missing at random, but in healthcare, missingness is highly informative and systematically related to patient characteristics. Laboratory tests are ordered more frequently for sicker patients who can afford regular healthcare access. Vital signs are monitored continuously for insured patients in ICUs but intermittently for uninsured patients in emergency departments. Imputing missing values without accounting for these patterns risks introducing biases that disproportionately affect underserved populations. Models that explicitly represent observation times and adapt to varying sampling frequencies provide more equitable performance across diverse patient populations.
 
@@ -2212,7 +2212,7 @@ Multimodal deep learning requires encoding each modality into a common represent
 
 $$\mathbf{h} = f([\mathbf{x}_1; \mathbf{x}_2; \ldots; \mathbf{x}_M])$$
 
-where $\mathbf{x}_m$ represents modality $m$ and $[\cdot; \cdot]$ denotes concatenation. Early fusion allows the model to discover interactions between modalities but requires aligned inputs and struggles when modalities have very different characteristics.
+where $$\mathbf{x}_m$$ represents modality $$m$$ and $$[\cdot; \cdot]$$ denotes concatenation. Early fusion allows the model to discover interactions between modalities but requires aligned inputs and struggles when modalities have very different characteristics.
 
 Late fusion processes each modality independently, combining predictions or high-level representations:
 
@@ -2220,23 +2220,23 @@ $$\mathbf{z}_m = f_m(\mathbf{x}_m) \quad \text{for } m = 1, \ldots, M$$
 
 $$\hat{y} = g([\mathbf{z}_1; \mathbf{z}_2; \ldots; \mathbf{z}_M])$$
 
-where each $f_m$ is a modality-specific encoder and $g$ is a fusion function. Late fusion better handles heterogeneous modalities but may miss early interactions between modalities.
+where each $$f_m$$ is a modality-specific encoder and $$g$$ is a fusion function. Late fusion better handles heterogeneous modalities but may miss early interactions between modalities.
 
 Intermediate fusion offers a compromise, fusing modality-specific representations at multiple layers:
 
 $$\mathbf{h}^{(l)} = \text{Fusion}(\{\phi_m^{(l)}(\mathbf{x}_m)\}_{m=1}^M)$$
 
-where $\phi_m^{(l)}$ encodes modality $m$ to layer $l$ and Fusion combines these representations. Cross-modal attention mechanisms enable each modality to attend to relevant information in other modalities:
+where $$\phi_m^{(l)}$$ encodes modality $$m$$ to layer $$l$$ and Fusion combines these representations. Cross-modal attention mechanisms enable each modality to attend to relevant information in other modalities:
 
 $$\mathbf{h}_m = \sum_{m' \neq m} \alpha_{m,m'} \mathbf{z}_{m'}$$
 
-where $\alpha_{m,m'} = \text{softmax}(\mathbf{z}_m^T \mathbf{W}_{m,m'} \mathbf{z}_{m'})$ weights modality $m'$'s representation when encoding modality $m$.
+where $$\alpha_{m,m'} = \text{softmax}(\mathbf{z}_m^T \mathbf{W}_{m,m'} \mathbf{z}_{m'})$$ weights modality $$m'$$'s representation when encoding modality $$m$$.
 
 ### 5.5.2 Handling Missing Modalities
 
 In clinical settings, certain modalities are systematically absent for some patients. Advanced imaging studies are ordered based on clinical indication and resource availability. Genomic testing remains inaccessible for uninsured patients. Language barriers affect clinical documentation quality for patients with limited English proficiency. A multimodal model that requires all modalities during inference is clinically impractical and risks systematic performance degradation for patients with missing modalities.
 
-Modality dropout during training prepares models for missing data at test time. During each training iteration, modalities are randomly dropped with probability $p$:
+Modality dropout during training prepares models for missing data at test time. During each training iteration, modalities are randomly dropped with probability $$p$$:
 
 $$\mathbf{z}_m = \begin{cases}
 \phi_m(\mathbf{x}_m) & \text{with probability } 1-p \\
@@ -2249,7 +2249,7 @@ Learned modality importance weights enable the model to adapt to available modal
 
 $$\mathbf{h} = \sum_{m \in \mathcal{M}} w_m(\mathcal{M}) \mathbf{z}_m$$
 
-where $\mathcal{M}$ is the set of available modalities and $w_m(\mathcal{M})$ are learned weights that depend on which modalities are present. When certain modalities are missing, the model reweights available information optimally.
+where $$\mathcal{M}$$ is the set of available modalities and $$w_m(\mathcal{M})$$ are learned weights that depend on which modalities are present. When certain modalities are missing, the model reweights available information optimally.
 
 From an equity perspective, models robust to missing modalities are essential. If certain modalities are systematically unavailable for underserved populations—genomic data for uninsured patients, advanced imaging for rural populations—requiring these modalities produces inequitable performance. Training with modality dropout and dynamically adapting to available inputs enables models to provide useful predictions across diverse clinical contexts with varying resource availability.
 
@@ -2265,7 +2265,7 @@ For healthcare AI serving diverse populations, distinguishing these uncertainty 
 
 ### 5.6.2 Monte Carlo Dropout for Uncertainty Estimation
 
-Dropout, normally used only during training for regularization, can provide uncertainty estimates at test time through Monte Carlo sampling. During training, dropout randomly zeroes activations with probability $p$:
+Dropout, normally used only during training for regularization, can provide uncertainty estimates at test time through Monte Carlo sampling. During training, dropout randomly zeroes activations with probability $$p$$:
 
 $$\mathbf{h}_i = \begin{cases}
 f(\mathbf{z}_i) / (1-p) & \text{with probability } 1-p \\
@@ -2276,7 +2276,7 @@ For uncertainty estimation, dropout is applied during inference as well. Multipl
 
 $$\{\hat{y}^{(1)}, \hat{y}^{(2)}, \ldots, \hat{y}^{(T)}\} = \{\text{Model}(\mathbf{x}; \theta, \epsilon^{(t)})\}_{t=1}^T$$
 
-where $\epsilon^{(t)}$ represents the dropout mask for pass $t$. The mean provides the point prediction:
+where $$\epsilon^{(t)}$$ represents the dropout mask for pass $$t$$. The mean provides the point prediction:
 
 $$\hat{y} = \frac{1}{T} \sum_{t=1}^T \hat{y}^{(t)}$$
 
@@ -2288,7 +2288,7 @@ Monte Carlo dropout approximates Bayesian inference over network weights, with d
 
 ### 5.6.3 Deep Ensembles
 
-Training multiple models with different random initializations creates an ensemble that captures epistemic uncertainty. Each model $f_i$ with parameters $\theta_i$ produces predictions $\hat{y}_i = f_i(\mathbf{x}; \theta_i)$. The ensemble prediction averages individual predictions:
+Training multiple models with different random initializations creates an ensemble that captures epistemic uncertainty. Each model $$f_i$$ with parameters $$\theta_i$$ produces predictions $$\hat{y}_i = f_i(\mathbf{x}; \theta_i)$$. The ensemble prediction averages individual predictions:
 
 $$\hat{y} = \frac{1}{M} \sum_{i=1}^M \hat{y}_i$$
 
@@ -2300,27 +2300,27 @@ Deep ensembles provide well-calibrated uncertainty estimates and often outperfor
 
 ### 5.6.4 Conformal Prediction for Distribution-Free Uncertainty
 
-Conformal prediction provides finite-sample prediction intervals with guaranteed coverage without assumptions about the data distribution. Given a trained model $f$ and calibration set $\{(x_i, y_i)\}_{i=1}^n$, conformal prediction constructs prediction intervals for new inputs.
+Conformal prediction provides finite-sample prediction intervals with guaranteed coverage without assumptions about the data distribution. Given a trained model $$f$$ and calibration set $$\{(x_i, y_i)\}_{i=1}^n$$, conformal prediction constructs prediction intervals for new inputs.
 
 For regression, compute residuals on the calibration set:
 
 $$r_i = \bigl\lvert y_i - f(x_i) \bigr\rvert$$
 
-Sort these residuals and find the $\lceil (1-\alpha)(n+1) \rceil$-th quantile $q$. For a new input $x$, the prediction interval is:
+Sort these residuals and find the $$\lceil (1-\alpha)(n+1) \rceil$$-th quantile $$q$$. For a new input $$x$$, the prediction interval is:
 
 $$[f(x) - q, f(x) + q]$$
 
-This interval contains the true value with probability at least $1-\alpha$ regardless of the data distribution or model quality.
+This interval contains the true value with probability at least $$1-\alpha$$ regardless of the data distribution or model quality.
 
-For classification, conformal prediction constructs prediction sets containing the true class with probability $1-\alpha$. Compute nonconformity scores for calibration examples:
+For classification, conformal prediction constructs prediction sets containing the true class with probability $$1-\alpha$$. Compute nonconformity scores for calibration examples:
 
 $$s_i = 1 - \pi_{y_i}(x_i)$$
 
-where $\pi_{y_i}(x_i)$ is the predicted probability for the true class. For a new input $x$, include class $c$ in the prediction set if:
+where $$\pi_{y_i}(x_i)$$ is the predicted probability for the true class. For a new input $$x$$, include class $$c$$ in the prediction set if:
 
 $$1 - \pi_c(x) \leq q$$
 
-where $q$ is the $\lceil (1-\alpha)(n+1) \rceil$-th quantile of calibration scores $\{s_i\}$.
+where $$q$$ is the $$\lceil (1-\alpha)(n+1) \rceil$$-th quantile of calibration scores $$\{s_i\}$$.
 
 Conformal prediction offers strong theoretical guarantees and works with any underlying model. For healthcare AI, these distribution-free guarantees provide robust uncertainty quantification across diverse patient populations. When models encounter patients dissimilar to training data, conformal intervals appropriately widen to reflect increased uncertainty.
 
@@ -2330,7 +2330,7 @@ Deep neural networks are often criticized as "black boxes" that provide predicti
 
 ### 5.7.1 Attention Visualization
 
-Attention mechanisms in transformers and attention-augmented CNNs provide built-in interpretability by revealing which inputs the model focuses on when making predictions. For a transformer processing a clinical time series, attention weights $\alpha_{ij}$ indicate how much position $i$ attends to position $j$:
+Attention mechanisms in transformers and attention-augmented CNNs provide built-in interpretability by revealing which inputs the model focuses on when making predictions. For a transformer processing a clinical time series, attention weights $$\alpha_{ij}$$ indicate how much position $$i$$ attends to position $$j$$:
 
 $$\alpha_{ij} = \frac{\exp(q_i^T k_j / \sqrt{d})}{\sum_{j'} \exp(q_i^T k_{j'} / \sqrt{d})}$$
 
@@ -2358,11 +2358,11 @@ For clinical applications, gradient-based attribution can identify which clinica
 
 Gradient-based methods attribute predictions to individual features or pixels, but clinicians often reason about higher-level concepts like "consolidation" in chest radiographs or "elevated inflammatory markers" in laboratory data. Concept-based explanations bridge this gap by attributing predictions to human-interpretable concepts rather than raw features.
 
-Testing with Concept Activation Vectors (TCAV) measures how sensitive a model's predictions are to user-defined concepts. Given a concept (e.g., "infiltrate" in chest X-rays), collect positive examples (images containing infiltrates) and negative examples (images without infiltrates). Train a linear classifier to distinguish these examples in the model's representation space. The classifier's normal vector $\mathbf{v}_C$ defines the concept direction. The TCAV score measures how much the prediction changes in the concept direction:
+Testing with Concept Activation Vectors (TCAV) measures how sensitive a model's predictions are to user-defined concepts. Given a concept (e.g., "infiltrate" in chest X-rays), collect positive examples (images containing infiltrates) and negative examples (images without infiltrates). Train a linear classifier to distinguish these examples in the model's representation space. The classifier's normal vector $$\mathbf{v}_C$$ defines the concept direction. The TCAV score measures how much the prediction changes in the concept direction:
 
-$$\text{TCAV}_C = \frac{1}{n} \sum_{i=1}^n \mathbf{1}_{\{\nabla h_l(\mathbf{x}_i) \cdot \mathbf{v}_C > 0\}}$$
+$$\text{TCAV}_C = \frac{1}{n} \sum_{i=1}^n \mathbf{1}_{\{\nabla h_l(\mathbf{x}_i) \cdot \mathbf{v}_C \gt  0\}}$$
 
-where $h_l(\mathbf{x}_i)$ is the representation at layer $l$ for example $i$. A high TCAV score indicates the model uses the concept for predictions.
+where $$h_l(\mathbf{x}_i)$$ is the representation at layer $$l$$ for example $$i$$. A high TCAV score indicates the model uses the concept for predictions.
 
 Concept bottleneck models build interpretability into the architecture by explicitly predicting concepts as an intermediate step:
 
@@ -2370,7 +2370,7 @@ $$\mathbf{c} = g(\mathbf{x}; \theta_g)$$
 
 $$\hat{y} = h(\mathbf{c}; \theta_h)$$
 
-where $\mathbf{c}$ represents concept predictions (e.g., presence of specific symptoms or image features) and $\hat{y}$ is the final prediction. This two-stage architecture enables intervention: clinicians can correct concept predictions if the model misidentifies concepts, improving final predictions.
+where $$\mathbf{c}$$ represents concept predictions (e.g., presence of specific symptoms or image features) and $$\hat{y}$$ is the final prediction. This two-stage architecture enables intervention: clinicians can correct concept predictions if the model misidentifies concepts, improving final predictions.
 
 For equity, concept-based explanations help identify when models use spurious correlations rather than legitimate diagnostic features. If a pneumonia detector uses chest X-ray device type (portable vs. fixed) as a concept, this reveals potential bias rather than valid clinical reasoning. Monitoring concept usage across demographic groups can surface fairness issues: if concepts differ systematically between groups, the model may be using different reasoning paths that reflect training data biases.
 
@@ -2398,13 +2398,13 @@ Beyond demographic factors, evaluation should stratify by clinical characteristi
 
 ### 5.8.2 Calibration Assessment
 
-Well-calibrated models produce predicted probabilities that match empirical frequencies. For a set of predictions with predicted probability $p$, the empirical frequency of positive outcomes should be approximately $p$. Calibration is assessed through reliability diagrams that bin predictions by predicted probability and compare predicted probabilities to empirical frequencies within bins.
+Well-calibrated models produce predicted probabilities that match empirical frequencies. For a set of predictions with predicted probability $$p$$, the empirical frequency of positive outcomes should be approximately $$p$$. Calibration is assessed through reliability diagrams that bin predictions by predicted probability and compare predicted probabilities to empirical frequencies within bins.
 
 The expected calibration error (ECE) quantifies calibration:
 
 $$\text{ECE} = \sum_{m=1}^M \frac{\lvert B_m \rvert}{n} \bigl\lvert\text{acc}(B_m) - \text{conf}(B_m)\bigr\rvert$$
 
-where $B_m$ is the set of predictions in bin $m$, $\text{acc}(B_m)$ is the empirical accuracy in that bin, and $\text{conf}(B_m)$ is the average predicted confidence. Lower ECE indicates better calibration.
+where $$B_m$$ is the set of predictions in bin $$m$$, $$\text{acc}(B_m)$$ is the empirical accuracy in that bin, and $$\text{conf}(B_m)$$ is the average predicted confidence. Lower ECE indicates better calibration.
 
 Calibration must be assessed separately for demographic subgroups. Models may be well-calibrated overall while being poorly calibrated for minority groups. A model that systematically over-predicts risk for Black patients is poorly calibrated for that population even if overall calibration appears good.
 
@@ -2414,11 +2414,11 @@ Multiple fairness metrics quantify different notions of equitable treatment. Dem
 
 $$P(\hat{Y} = 1 \mid A = a) = P(\hat{Y} = 1 \mid A = a')$$
 
-for all demographic groups $a, a'$. Equalized odds requires equal true positive rates and false positive rates:
+for all demographic groups $$a, a'$$. Equalized odds requires equal true positive rates and false positive rates:
 
 $$P(\hat{Y} = 1 \mid Y = y, A = a) = P(\hat{Y} = 1 \mid Y = y, A = a')$$
 
-for $y \in \{0, 1\}$ and all groups. Calibration within groups ensures predicted probabilities match empirical frequencies within each demographic group.
+for $$y \in \{0, 1\}$$ and all groups. Calibration within groups ensures predicted probabilities match empirical frequencies within each demographic group.
 
 These metrics can conflict: improving one may worsen others. Choosing appropriate fairness metrics requires considering the specific clinical application and potential harms. For screening applications, equal sensitivity across groups may be most important. For resource allocation, calibration within groups ensures fair risk assessment.
 
