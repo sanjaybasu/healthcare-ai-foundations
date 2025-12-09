@@ -16,7 +16,7 @@ kramdown:
     block:
       line_numbers: false
   # CRITICAL: Math engine configuration for LaTeX rendering
-  math_engine: mathjax
+  math_engine: null
   math_engine_opts:
     preview: true
     preview_as_code: false
