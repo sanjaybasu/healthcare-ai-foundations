@@ -47,25 +47,17 @@ Mathematical representation of these frameworks requires specifying directed acy
 
 Let $$Z $$ represent structural determinants (policy environment, macroeconomic conditions), $$ S $$ represent social position (income, education, occupation), $$ M $$ represent intermediate mechanisms (stress, health behaviors, environmental exposures), and $$ Y$$ represent health outcomes. The structural equations might be:
 
-$$
-S = f_S(Z, U_S)
-$$
+$$S = f_S(Z, U_S)$$
 
-$$
-M = f_M(Z, S, U_M)
-$$
+$$M = f_M(Z, S, U_M)$$
 
-$$
-Y = f_Y(Z, S, M, U_Y)
-$$
+$$Y = f_Y(Z, S, M, U_Y)$$
 
 where $$U_S $$, $$ U_M $$, and $$ U_Y $$ represent unmeasured factors affecting each variable. This model encodes that structural determinants directly affect social position, both structural determinants and social position affect intermediate mechanisms, and all three affect health outcomes through potentially nonlinear functions $$ f$$.
 
 The total effect of structural determinants on health decomposes into direct effects and indirect effects mediated through social position and intermediate mechanisms:
 
-$$
-\text{Total Effect} = \frac{\partial Y}{\partial Z} + \frac{\partial Y}{\partial S}\frac{\partial S}{\partial Z} + \frac{\partial Y}{\partial M}\left(\frac{\partial M}{\partial Z} + \frac{\partial M}{\partial S}\frac{\partial S}{\partial Z}\right)
-$$
+$$\text{Total Effect} = \frac{\partial Y}{\partial Z} + \frac{\partial Y}{\partial S}\frac{\partial S}{\partial Z} + \frac{\partial Y}{\partial M}\left(\frac{\partial M}{\partial Z} + \frac{\partial M}{\partial S}\frac{\partial S}{\partial Z}\right)$$
 
 Estimating these causal effects from observational data requires addressing confounding, measurement error, and selection bias—challenges we address through causal inference methods later in this chapter.
 
@@ -470,21 +462,15 @@ Consider the causal diagram: Structural determinant $$Z $$ → Social position $
 
 The total effect of $$ Z $$ on $$ Y$$ decomposes as:
 
-$$
-TE = NDE + NIE
-$$
+$$TE = NDE + NIE$$
 
 where $$NDE $$ is the natural direct effect (effect not mediated by $$ S $$ or $$ M $$) and $$ NIE $$ is the natural indirect effect (effect mediated through $$ S $$ and $$ M$$).
 
 Under sequential ignorability assumptions—no unmeasured confounding of treatment-outcome, treatment-mediator, and mediator-outcome relationships—these effects can be identified using regression-based approaches:
 
-$$
-NDE = E[Y(z=1, M(z=0))] - E[Y(z=0, M(z=0))]
-$$
+$$NDE = E[Y(z=1, M(z=0))] - E[Y(z=0, M(z=0))]$$
 
-$$
-NIE = E[Y(z=1, M(z=1))] - E[Y(z=1, M(z=0))]
-$$
+$$NIE = E[Y(z=1, M(z=1))] - E[Y(z=1, M(z=0))]$$
 
 where $$Y(z, M(z'))$$ denotes the potential outcome under treatment $$ z $$ and mediator value it would take under treatment $$ z'$$.
 
@@ -511,17 +497,13 @@ A structural equation model consists of two components:
 
 **Measurement model**: Relates observed variables to latent constructs
 
-$$
-X = \Lambda_X \xi + \delta
-$$
+$$X = \Lambda_X \xi + \delta$$
 
 where $$X $$ is a vector of observed indicators, $$\xi $$ is a vector of latent exogenous variables, $$\Lambda_X $$ is a matrix of factor loadings, and $$\delta$$ is measurement error.
 
 **Structural model**: Specifies causal relationships among latent variables
 
-$$
-\eta = B\eta + \Gamma\xi + \zeta
-$$
+$$\eta = B\eta + \Gamma\xi + \zeta$$
 
 where $$\eta $$ is a vector of latent endogenous variables, $$ B $$ captures effects among endogenous variables, $$\Gamma $$ captures effects of exogenous on endogenous variables, and $$\zeta $$ is structural error.
 
@@ -554,15 +536,11 @@ The two-stage least squares (2SLS) estimator proceeds:
 
 **First stage**: Regress treatment on instrument and covariates
 
-$$
-D_i = \alpha_0 + \alpha_1 Z_i + \alpha_2' X_i + \epsilon_i
-$$
+$$D_i = \alpha_0 + \alpha_1 Z_i + \alpha_2' X_i + \epsilon_i$$
 
 **Second stage**: Regress outcome on predicted treatment and covariates
 
-$$
-Y_i = \beta_0 + \beta_1 \hat{D}_i + \beta_2' X_i + u_i
-$$
+$$Y_i = \beta_0 + \beta_1 \hat{D}_i + \beta_2' X_i + u_i$$
 
 The 2SLS estimate of $$\beta_1$$ is consistent for the local average treatment effect (LATE)—the causal effect for compliers whose treatment status is affected by the instrument.
 
@@ -580,17 +558,13 @@ For social determinants, examples include:
 
 The RD estimate compares outcomes just above versus just below the threshold:
 
-$$
-\tau_{RD} = \lim_{x \downarrow c} E[Y\lvert X=x] - \lim_{x \uparrow c} E[Y \rvert X=x]
-$$
+$$\tau_{RD} = \lim_{x \downarrow c} E[Y\lvert X=x] - \lim_{x \uparrow c} E[Y \rvert X=x]$$
 
 where $$c $$ is the cutoff value of running variable $$ X$$.
 
 Estimation typically uses local linear regression within a bandwidth around the cutoff:
 
-$$
-Y_i = \alpha + \tau D_i + \beta(X_i - c) + \gamma D_i(X_i - c) + \epsilon_i
-$$
+$$Y_i = \alpha + \tau D_i + \beta(X_i - c) + \gamma D_i(X_i - c) + \epsilon_i$$
 
 where $$D_i $$ indicates above-threshold status. The estimate $$\hat{\tau}$$ identifies the causal effect at the threshold under continuity assumptions.
 
@@ -602,9 +576,7 @@ Difference-in-differences (DiD) designs compare changes over time in treated ver
 
 For policy evaluations affecting social determinants:
 
-$$
-Y_{it} = \alpha + \beta \text{Treat}_i + \gamma \text{Post}_t + \delta(\text{Treat}_i \times \text{Post}_t) + \epsilon_{it}
-$$
+$$Y_{it} = \alpha + \beta \text{Treat}_i + \gamma \text{Post}_t + \delta(\text{Treat}_i \times \text{Post}_t) + \epsilon_{it}$$
 
 where $$\text{Treat}_i $$ indicates treatment group, $$\text{Post}_t $$ indicates post-policy period, and $$\delta $$ is the DiD estimate.
 

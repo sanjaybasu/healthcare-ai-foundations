@@ -43,25 +43,19 @@ Catastrophic forgetting, also termed catastrophic interference, describes the te
 
 Consider a neural network with parameters $$ \theta $$ trained sequentially on a series of tasks $$ T_1, T_2, \ldots, T_n $$. For each task $$ T_i $$, we have a dataset $$ \mathcal{D}_i = \{(x_j^{(i)}, y_j^{(i)})\}_{j=1}^{N_i} $$ and a loss function $$ \mathcal{L}_i(\theta) $$. In traditional supervised learning, we would train on task $$ T_i $$ by minimizing:
 
-$$
-\theta_i^* = \arg\min_{\theta} \mathcal{L}_i(\theta) = \arg\min_{\theta} \frac{1}{N_i} \sum_{j=1}^{N_i} \ell(f_\theta(x_j^{(i)}), y_j^{(i)})
-$$
+$$\theta_i^* = \arg\min_{\theta} \mathcal{L}_i(\theta) = \arg\min_{\theta} \frac{1}{N_i} \sum_{j=1}^{N_i} \ell(f_\theta(x_j^{(i)}), y_j^{(i)})$$
 
 where $$ \ell $$ is a loss function such as cross-entropy for classification or mean squared error for regression, and $$ f_\theta $$ represents the neural network function parameterized by $$ \theta $$.
 
 When we subsequently train on task $$ T_{i+1} $$, standard stochastic gradient descent updates the parameters according to:
 
-$$
-\theta \leftarrow \theta - \eta \nabla_\theta \mathcal{L}_{i+1}(\theta)
-$$
+$$\theta \leftarrow \theta - \eta \nabla_\theta \mathcal{L}_{i+1}(\theta)$$
 
 where $$ \eta $$ is the learning rate. The problem is that these updates are computed solely based on the loss for task $$ T_{i+1} $$, with no explicit constraint to preserve performance on tasks $$ T_1, \ldots, T_i $$. Because neural networks use distributed representations where the same parameters influence predictions across multiple tasks, updates optimized for $$ T_{i+1} $$ can dramatically increase loss on previous tasks.
 
 To quantify catastrophic forgetting, we measure the performance change on previous tasks after learning new tasks. Let $$ A_i(j) $$ denote the accuracy on task $$ T_j $$ after training on tasks $$ T_1, \ldots, T_i $$. The average forgetting after learning task $$ T_n $$ is:
 
-$$
-\mathcal{F}_n = \frac{1}{n-1} \sum_{i=1}^{n-1} \left( \max_{j \in \{i, \ldots, n-1\}} A_j(i) - A_n(i) \right)
-$$
+$$\mathcal{F}_n = \frac{1}{n-1} \sum_{i=1}^{n-1} \left( \max_{j \in \{i, \ldots, n-1\}} A_j(i) - A_n(i) \right)$$
 
 This metric captures the maximum accuracy achieved on each task before learning subsequent tasks, minus the final accuracy after learning all tasks. High values of $$ \mathcal{F}_n $$ indicate severe catastrophic forgetting.
 
@@ -79,15 +73,11 @@ Furthermore, the temporal dynamics of healthcare access mean that some populatio
 
 Several theoretical frameworks help explain why neural networks exhibit catastrophic forgetting. The neural tangent kernel (NTK) theory provides one perspective. For infinitely wide neural networks in the lazy training regime, the network function evolves according to a kernel gradient descent in function space:
 
-$$
-\frac{\partial f_\theta(x)}{\partial t} = -\eta \Theta(x, x') \nabla_{f(x')} \mathcal{L}
-$$
+$$\frac{\partial f_\theta(x)}{\partial t} = -\eta \Theta(x, x') \nabla_{f(x')} \mathcal{L}$$
 
 where $$ \Theta(x, x') $$ is the neural tangent kernel defined as:
 
-$$
-\Theta(x, x') = \mathbb{E}_{\theta \sim \mathcal{P}_0} \left[ \nabla_\theta f_\theta(x)^T \nabla_\theta f_\theta(x') \right]
-$$
+$$\Theta(x, x') = \mathbb{E}_{\theta \sim \mathcal{P}_0} \left[ \nabla_\theta f_\theta(x)^T \nabla_\theta f_\theta(x') \right]$$
 
 and $$ \mathcal{P}_0 $$ is the initialization distribution. In this regime, the network function at initialization plus its linear approximation around initialization parameters describes the network's evolution during training. When training on a new task, the gradient updates are computed based only on the new task's loss landscape, leading to changes in the function that can be destructive for previous tasks unless the neural tangent kernels for different tasks have specific structure that preserves previous performance.
 
@@ -95,9 +85,7 @@ An alternative perspective comes from mode connectivity and loss landscape analy
 
 Bayesian perspectives on continual learning model parameter uncertainty and update the posterior distribution over parameters as new data arrives. Let $$ p(\theta \mid \mathcal{D}_1) $$ be the posterior after training on task 1. When task 2 data arrives, we should update:
 
-$$
-p(\theta \mid \mathcal{D}_1, \mathcal{D}_2) \propto p(\mathcal{D}_2 \mid \theta) p(\theta \mid \mathcal{D}_1)
-$$
+$$p(\theta \mid \mathcal{D}_1, \mathcal{D}_2) \propto p(\mathcal{D}_2 \mid \theta) p(\theta \mid \mathcal{D}_1)$$
 
 This formulation naturally incorporates knowledge from previous tasks through the prior $$ p(\theta \mid \mathcal{D}_1) $$. However, computing and maintaining exact posteriors is intractable for high-dimensional neural network parameter spaces, leading to the development of approximate Bayesian continual learning methods that we discuss in subsequent sections.
 
@@ -109,39 +97,29 @@ Regularization-based approaches to continual learning add penalty terms to the l
 
 Elastic Weight Consolidation (EWC), introduced by Kirkpatrick and colleagues in 2017, provides a principled Bayesian approach to identifying important parameters. EWC approximates the posterior distribution over parameters after learning previous tasks as a Gaussian centered at the optimal parameters $$ \theta_A^* $$ for those tasks:
 
-$$
-p(\theta \mid \mathcal{D}_A) \approx \mathcal{N}(\theta; \theta_A^*, F_A^{-1})
-$$
+$$p(\theta \mid \mathcal{D}_A) \approx \mathcal{N}(\theta; \theta_A^*, F_A^{-1})$$
 
 where $$ F_A $$ is the Fisher information matrix evaluated at $$ \theta_A^* $$:
 
-$$
-F_A = \mathbb{E}_{x \sim \mathcal{D}_A} \left[ \nabla_\theta \log p(y\mid x, \theta_A^*) \nabla_\theta \log p(y \mid x, \theta_A^*)^T \right]
-$$
+$$F_A = \mathbb{E}_{x \sim \mathcal{D}_A} \left[ \nabla_\theta \log p(y\mid x, \theta_A^*) \nabla_\theta \log p(y \mid x, \theta_A^*)^T \right]$$
 
 The Fisher information matrix captures how sensitive the log-likelihood is to changes in each parameter. Parameters with high Fisher information are those for which small changes cause large changes in the likelihood, indicating these parameters are important for the task.
 
 When learning a new task $$ B $$, EWC adds a regularization term that penalizes changes to parameters weighted by their Fisher information:
 
-$$
-\mathcal{L}_{EWC}(\theta) = \mathcal{L}_B(\theta) + \frac{\lambda}{2} \sum_i F_i (\theta_i - \theta_{A,i}^*)^2
-$$
+$$\mathcal{L}_{EWC}(\theta) = \mathcal{L}_B(\theta) + \frac{\lambda}{2} \sum_i F_i (\theta_i - \theta_{A,i}^*)^2$$
 
 where $$ \lambda $$ controls the relative importance of the regularization term. Parameters with high Fisher information are strongly constrained to remain close to their values after training on previous tasks, while parameters with low Fisher information can change freely to accommodate the new task.
 
 The Fisher information matrix is typically intractable to compute exactly for large neural networks, as it requires computing second derivatives of the log-likelihood. EWC uses an efficient diagonal approximation:
 
-$$
-F_i \approx \frac{1}{N} \sum_{n=1}^{N} \left( \frac{\partial \log p(y_n \mid x_n, \theta)}{\partial \theta_i} \right)^2 \bigg|_{\theta = \theta_A^*}
-$$
+$$F_i \approx \frac{1}{N} \sum_{n=1}^{N} \left( \frac{\partial \log p(y_n \mid x_n, \theta)}{\partial \theta_i} \right)^2 \bigg|_{\theta = \theta_A^*}$$
 
 This diagonal approximation assumes independence between parameters, which is clearly an approximation for neural networks where parameters interact through nonlinear activations. Nevertheless, empirical results show this approximation provides effective regularization in practice.
 
 For continual learning across multiple tasks $$ T_1, T_2, \ldots, T_n $$, we can accumulate Fisher information matrices across tasks. After learning task $$ T_k $$, we compute $$ F_k $$ and store it along with $$ \theta_k^* $$. When learning task $$ T_{k+1} $$, the loss becomes:
 
-$$
-\mathcal{L}(\theta) = \mathcal{L}_{k+1}(\theta) + \sum_{j=1}^{k} \frac{\lambda_j}{2} \sum_i F_{j,i} (\theta_i - \theta_{j,i}^*)^2
-$$
+$$\mathcal{L}(\theta) = \mathcal{L}_{k+1}(\theta) + \sum_{j=1}^{k} \frac{\lambda_j}{2} \sum_i F_{j,i} (\theta_i - \theta_{j,i}^*)^2$$
 
 This formulation can lead to memory issues as we must store Fisher information matrices and optimal parameters for all previous tasks. Online EWC addresses this by maintaining a single cumulative Fisher information matrix that is updated as new tasks arrive, sacrificing some theoretical rigor for practical scalability.
 
@@ -151,25 +129,19 @@ Synaptic Intelligence (SI), proposed by Zenke, Poole, and Ganguli in 2017, takes
 
 The contribution of parameter $$ \theta_i $$ to reducing the loss on task $$ k $$ over the learning trajectory is:
 
-$$
-\omega_i^{(k)} = \sum_{t} -g_i^{(k)}(t) \Delta \theta_i(t)
-$$
+$$\omega_i^{(k)} = \sum_{t} -g_i^{(k)}(t) \Delta \theta_i(t)$$
 
 where $$ g_i^{(k)}(t) $$ is the gradient of the loss for task $$ k $$ with respect to parameter $$ i $$ at time step $$ t $$, and $$ \Delta \theta_i(t) = \theta_i(t+1) - \theta_i(t) $$ is the parameter change at that time step. This quantity measures how much each parameter contributed to loss reduction: parameters that move in the direction of the negative gradient contribute positively to $$ \omega_i^{(k)} $$.
 
 To prevent numerical issues and ensure scale invariance, SI normalizes these contributions by the total parameter change:
 
-$$
-\Omega_i^{(k)} = \frac{\omega_i^{(k)}}{(\Delta \theta_i^{(k)})^2 + \xi}
-$$
+$$\Omega_i^{(k)} = \frac{\omega_i^{(k)}}{(\Delta \theta_i^{(k)})^2 + \xi}$$
 
 where $$ \Delta \theta_i^{(k)} = \theta_i^{(k+1)} - \theta_i^{(k)} $$ is the total change in parameter $$ i $$ during training on task $$ k $$, and $$ \xi $$ is a small damping parameter for numerical stability.
 
 When learning task $$ k+1 $$, SI adds a quadratic penalty on parameter changes weighted by these importance measures:
 
-$$
-\mathcal{L}_{SI}(\theta) = \mathcal{L}_{k+1}(\theta) + c \sum_{j=1}^{k} \sum_i \Omega_i^{(j)} (\theta_i - \theta_i^{(j)})^2
-$$
+$$\mathcal{L}_{SI}(\theta) = \mathcal{L}_{k+1}(\theta) + c \sum_{j=1}^{k} \sum_i \Omega_i^{(j)} (\theta_i - \theta_i^{(j)})^2$$
 
 Similar to EWC, this encourages parameters that were important for previous tasks to change minimally when learning new tasks. Unlike EWC, SI computes importance based on the actual contribution of parameters during training rather than curvature of the loss surface at the final parameters, potentially providing a more direct measure of parameter importance.
 
@@ -177,9 +149,7 @@ Similar to EWC, this encourages parameters that were important for previous task
 
 Memory Aware Synapses (MAS), introduced by Aljundi and colleagues in 2018, estimates parameter importance based on the sensitivity of the learned function output to parameter changes rather than sensitivity of the loss. The importance of parameter $$ \theta_i $$ is defined as:
 
-$$
-\Omega_i = \frac{1}{N} \sum_{n=1}^{N} \left\| \frac{\partial f_\theta(x_n)}{\partial \theta_i} \right\|^2
-$$
+$$\Omega_i = \frac{1}{N} \sum_{n=1}^{N} \left\| \frac{\partial f_\theta(x_n)}{\partial \theta_i} \right\|^2$$
 
 This measures how much the network's output changes when parameter $$ i $$ changes, averaged over the data distribution. Parameters that strongly influence the output are deemed important and should be preserved during subsequent learning.
 
@@ -203,9 +173,7 @@ Replay-based approaches to continual learning maintain a memory buffer containin
 
 Experience Replay, widely used in reinforcement learning and adapted for continual supervised learning, maintains a memory buffer $$ \mathcal{M} $$ containing $$ (x, y) $$ pairs from previous tasks. When learning from new data $$ \mathcal{D}_{new} $$, the model is trained on batches that combine new samples with samples randomly drawn from $$ \mathcal{M} $$:
 
-$$
-\mathcal{L}_{replay}(\theta) = \mathbb{E}_{(x,y) \sim \mathcal{D}_{new}} [\ell(f_\theta(x), y)] + \alpha \mathbb{E}_{(x,y) \sim \mathcal{M}} [\ell(f_\theta(x), y)]
-$$
+$$\mathcal{L}_{replay}(\theta) = \mathbb{E}_{(x,y) \sim \mathcal{D}_{new}} [\ell(f_\theta(x), y)] + \alpha \mathbb{E}_{(x,y) \sim \mathcal{M}} [\ell(f_\theta(x), y)]$$
 
 where $$ \alpha $$ controls the relative weight of replayed samples. This approach ensures that the model maintains exposure to previous data distributions throughout training on new tasks, preventing the parameter updates from being driven solely by the new task.
 
@@ -215,9 +183,7 @@ The critical design decision in experience replay is the memory management strat
 
 **Herding:** Selects samples that best represent the feature distribution of each class or task. For a given class $$ c $$, herding maintains a memory set $$ \mathcal{M}_c $$ such that the mean feature representation of samples in $$ \mathcal{M}_c $$ is close to the mean feature representation of all samples of class $$ c $$:
 
-$$
-\mathcal{M}_c = \arg\min_{\mathcal{S} \subseteq \mathcal{D}_c, \lvert \mathcal{S} \rvert = m} \left\| \frac{1}{\lvert \mathcal{D}_c \rvert} \sum_{x \in \mathcal{D}_c} \phi(x) - \frac{1}{m} \sum_{x \in \mathcal{S}} \phi(x) \right\|^2
-$$
+$$\mathcal{M}_c = \arg\min_{\mathcal{S} \subseteq \mathcal{D}_c, \lvert \mathcal{S} \rvert = m} \left\| \frac{1}{\lvert \mathcal{D}_c \rvert} \sum_{x \in \mathcal{D}_c} \phi(x) - \frac{1}{m} \sum_{x \in \mathcal{S}} \phi(x) \right\|^2$$
 
 where $$ \phi(x) $$ represents the feature embedding of sample $$ x $$ (typically the penultimate layer activations of the neural network), and $$ m $$ is the memory budget per class.
 
@@ -238,9 +204,7 @@ More sophisticated replay methods select memory samples based on their utility f
 
 In practice, this is enforced by checking whether the gradient on the current task $$ g_t = \nabla_\theta \mathcal{L}_t(\theta) $$ increases any previous task loss. If so, the gradient is projected to the nearest direction that does not increase previous task losses:
 
-$$
-g_t' = \arg\min_{g} \|g - g_t\|^2 \text{ subject to } g^T g_k \leq 0 \quad \forall k < t
-$$
+$$g_t' = \arg\min_{g} \|g - g_t\|^2 \text{ subject to } g^T g_k \leq 0 \quad \forall k < t$$
 
 where $$ g_k = \nabla_\theta \mathcal{L}_k(\theta) $$ is the gradient on task $$ k $$ computed using samples from memory. This projection can be efficiently computed using quadratic programming.
 
@@ -252,9 +216,7 @@ Generative replay addresses memory constraints by training a generative model to
 
 The loss function for generative replay combines the current task loss with a replay loss on generated samples:
 
-$$
-\mathcal{L}_{gen}(\theta) = \mathbb{E}_{(x,y) \sim \mathcal{D}_{new}} [\ell(f_\theta(x), y)] + \sum_{k=1}^{t-1} \mathbb{E}_{x \sim G_k} [\ell(f_\theta(x), f_{\theta_{k}}(x))]
-$$
+$$\mathcal{L}_{gen}(\theta) = \mathbb{E}_{(x,y) \sim \mathcal{D}_{new}} [\ell(f_\theta(x), y)] + \sum_{k=1}^{t-1} \mathbb{E}_{x \sim G_k} [\ell(f_\theta(x), f_{\theta_{k}}(x))]$$
 
 Note that for generated samples, the labels come from the model's own predictions at the end of training on task $$ k $$. This is necessary because the generator only produces input features, not labels. The model effectively trains to match its previous predictions on synthetic data from old tasks while learning new patterns from new task data.
 
@@ -272,9 +234,7 @@ Several strategies can promote fairness in replay:
 
 **Fairness-Preserving Herding:** Extends herding to consider demographic group representations alongside class distributions. The objective becomes minimizing the distance between the feature distribution of each class-demographic group combination in memory versus the original data:
 
-$$
-\mathcal{M} = \arg\min_{\mathcal{S}} \sum_{c,d} w_{c,d} \left\| \mu_{c,d}^{\mathcal{D}} - \mu_{c,d}^{\mathcal{S}} \right\|^2
-$$
+$$\mathcal{M} = \arg\min_{\mathcal{S}} \sum_{c,d} w_{c,d} \left\| \mu_{c,d}^{\mathcal{D}} - \mu_{c,d}^{\mathcal{S}} \right\|^2$$
 
 where $$ \mu_{c,d}^{\mathcal{D}} $$ and $$ \mu_{c,d}^{\mathcal{S}} $$ are mean feature representations for class $$ c $$ and demographic group $$ d $$ in the full dataset and memory set respectively, and $$ w_{c,d} $$ are weights emphasizing rare class-demographic combinations.
 
@@ -292,9 +252,7 @@ Progressive Neural Networks, introduced by Rusu and colleagues in 2016, create a
 
 Formally, the activation $$ h_i^{(t)} $$ at layer $$ i $$ for task $$ t $$ is:
 
-$$
-h_i^{(t)} = \sigma\left(W_i^{(t)} h_{i-1}^{(t)} + \sum_{k=1}^{t-1} U_i^{(k \rightarrow t)} h_{i-1}^{(k)}\right)
-$$
+$$h_i^{(t)} = \sigma\left(W_i^{(t)} h_{i-1}^{(t)} + \sum_{k=1}^{t-1} U_i^{(k \rightarrow t)} h_{i-1}^{(k)}\right)$$
 
 where $$ W_i^{(t)} $$ are the within-column weights for task $$ t $$, $$ U_i^{(k \rightarrow t)} $$ are lateral connection weights from column $$ k $$ to column $$ t $$, and $$ \sigma $$ is a nonlinearity. The lateral connections allow new tasks to leverage features learned for previous tasks while the dedicated columns ensure that learning new tasks does not modify parameters used by previous tasks.
 
@@ -326,9 +284,7 @@ Dynamically Expandable Networks (DEN), proposed by Yoon and colleagues, selectiv
 
 The selective retraining phase minimizes:
 
-$$
-\mathcal{L}_{retrain}(\theta) = \mathcal{L}_{new}(\theta) + \lambda_1 \sum_i \mathbb{1}[\theta_i \text{ important}] \|\theta_i - \theta_i^{prev}\|^2 + \lambda_2 \sum_g \sqrt{\sum_{i \in g} \theta_i^2}
-$$
+$$\mathcal{L}_{retrain}(\theta) = \mathcal{L}_{new}(\theta) + \lambda_1 \sum_i \mathbb{1}[\theta_i \text{ important}] \|\theta_i - \theta_i^{prev}\|^2 + \lambda_2 \sum_g \sqrt{\sum_{i \in g} \theta_i^2}$$
 
 where the first regularization term preserves important parameters, and the second group sparsity term encourages entire neurons to be either active or inactive, facilitating clear task assignment.
 
@@ -342,15 +298,11 @@ Recent work has explored using hypernetworks—networks that generate weights fo
 
 Let $$ h_\phi $$ be the hypernetwork parameterized by $$ \phi $$, and let $$ e_t $$ be an embedding vector for task $$ t $$. The weights for task $$ t $$ are generated as:
 
-$$
-\theta_t = h_\phi(e_t)
-$$
+$$\theta_t = h_\phi(e_t)$$
 
 When learning task $$ t $$, we optimize:
 
-$$
-\min_{\phi, e_t} \mathcal{L}_t(f_{\theta_t}(x), y)
-$$
+$$\min_{\phi, e_t} \mathcal{L}_t(f_{\theta_t}(x), y)$$
 
 where $$ f_{\theta_t} $$ is the main network with weights $$ \theta_t $$. Previously learned task embeddings $$ e_1, \ldots, e_{t-1} $$ are frozen, so previous task weights $$ \theta_1, \ldots, \theta_{t-1} $$ remain unchanged.
 
@@ -376,21 +328,15 @@ Distribution shift can be taxonomized into several categories based on what aspe
 
 **Covariate Shift:** The input distribution $$ P(X) $$ changes while the conditional distribution of outputs given inputs $$ P(Y\mid X) $$ remains constant. In healthcare, covariate shift might occur when the demographic composition of a patient population changes due to migration patterns or changes in insurance coverage, but the relationship between patient features and clinical outcomes remains stable. Formally:
 
-$$
-P_{train}(Y\mid X) = P_{deploy}(Y \mid X) \quad \text{but} \quad P_{train}(X) \neq P_{deploy}(X)
-$$
+$$P_{train}(Y\mid X) = P_{deploy}(Y \mid X) \quad \text{but} \quad P_{train}(X) \neq P_{deploy}(X)$$
 
 **Label Shift:** The marginal distribution of outputs $$ P(Y) $$ changes while the conditional distribution of inputs given outputs $$ P(X\mid Y) $$ remains constant. This might occur when disease prevalence changes (e.g., seasonal variation in influenza, emergence of new pathogens like COVID-19) but the characteristic presentations of diseases remain stable. Formally:
 
-$$
-P_{train}(X\mid Y) = P_{deploy}(X \mid Y) \quad \text{but} \quad P_{train}(Y) \neq P_{deploy}(Y)
-$$
+$$P_{train}(X\mid Y) = P_{deploy}(X \mid Y) \quad \text{but} \quad P_{train}(Y) \neq P_{deploy}(Y)$$
 
 **Concept Drift:** The fundamental relationship between inputs and outputs $$ P(Y\mid X) $$ changes. This is the most challenging type of shift as it indicates the underlying phenomena being modeled have changed. In healthcare, concept drift occurs when treatment protocols change, new therapies become available, or the causal pathways linking risk factors to outcomes change. For example, the relationship between blood pressure and cardiovascular risk changed with the introduction of modern antihypertensive medications. Formally:
 
-$$
-P_{train}(Y\mid X) \neq P_{deploy}(Y \mid X)
-$$
+$$P_{train}(Y\mid X) \neq P_{deploy}(Y \mid X)$$
 
 **Domain Shift:** More generally, the entire joint distribution $$ P(X, Y) $$ changes, which may involve combinations of the above. Electronic health record systems often experience domain shift when transitioning from one documentation system to another, changing both the feature distributions and potentially the relationships between features and outcomes.
 
@@ -408,15 +354,11 @@ Detecting distribution shift is the first step in adaptive continual learning. N
 
 **Statistical Tests on Input Distributions:** Compare the distribution of input features between training and deployment time. The Maximum Mean Discrepancy (MMD) test is commonly used, measuring the distance between distribution embeddings in a reproducing kernel Hilbert space:
 
-$$
-MMD(P, Q) = \sup_{f \in \mathcal{F}} \left( \mathbb{E}_{x \sim P}[f(x)] - \mathbb{E}_{x \sim Q}[f(x)] \right)
-$$
+$$MMD(P, Q) = \sup_{f \in \mathcal{F}} \left( \mathbb{E}_{x \sim P}[f(x)] - \mathbb{E}_{x \sim Q}[f(x)] \right)$$
 
 For a finite sample, MMD can be computed as:
 
-$$
-\widehat{MMD}^2 = \frac{1}{n^2} \sum_{i,j} k(x_i, x_j) + \frac{1}{m^2} \sum_{i,j} k(x_i', x_j') - \frac{2}{nm} \sum_{i,j} k(x_i, x_j')
-$$
+$$\widehat{MMD}^2 = \frac{1}{n^2} \sum_{i,j} k(x_i, x_j) + \frac{1}{m^2} \sum_{i,j} k(x_i', x_j') - \frac{2}{nm} \sum_{i,j} k(x_i, x_j')$$
 
 where $$ k $$ is a kernel function, $$ \{x_i\} $$ are training samples, and $$ \{x_i'\} $$ are deployment samples. A permutation test establishes significance: if MMD between training and deployment is larger than most values obtained by randomly permuting labels, we conclude distribution shift has occurred.
 
@@ -442,9 +384,7 @@ Once shift is detected, several strategies exist for adapting models:
 
 **Importance Weighting:** Reweight training samples to account for covariate shift. If we can estimate the likelihood ratio $$ w(x) = \frac{P_{deploy}(x)}{P_{train}(x)} $$, we can train or adapt models using the weighted loss:
 
-$$
-\mathcal{L}_{weighted}(\theta) = \mathbb{E}_{x, y \sim P_{train}} [w(x) \ell(f_\theta(x), y)]
-$$
+$$\mathcal{L}_{weighted}(\theta) = \mathbb{E}_{x, y \sim P_{train}} [w(x) \ell(f_\theta(x), y)]$$
 
 This effectively emphasizes training samples that are more representative of the deployment distribution. Importance weighting is most effective for pure covariate shift but can be combined with other methods when multiple types of shift occur simultaneously.
 

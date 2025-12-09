@@ -64,37 +64,25 @@ A policy $$\pi: \mathcal{S} \rightarrow \Delta(\mathcal{A})$$ maps states to pro
 
 The goal of reinforcement learning is to find a policy that maximizes the expected cumulative discounted reward, also called the value function:
 
-$$
-V^\pi(s) = \mathbb{E}_\pi\left[\sum_{t=0}^{\infty} \gamma^t R(s_t, a_t, s_{t+1}) \mid s_0 = s\right]
-$$
+$$V^\pi(s) = \mathbb{E}_\pi\left[\sum_{t=0}^{\infty} \gamma^t R(s_t, a_t, s_{t+1}) \mid s_0 = s\right]$$
 
 The optimal value function is $$V^*(s) = \max_\pi V^\pi(s)$$, and the optimal policy achieves this maximum: $$\pi^* = \arg\max_\pi V^\pi(s)$$ for all states $$ s $$.
 
 The action-value function or Q-function evaluates taking action $$ a $$ in state $$ s $$ and then following policy $$\pi$$:
 
-$$
-Q^\pi(s,a) = \mathbb{E}_\pi\left[\sum_{t=0}^{\infty} \gamma^t R(s_t, a_t, s_{t+1}) \mid s_0 = s, a_0 = a\right]
-$$
+$$Q^\pi(s,a) = \mathbb{E}_\pi\left[\sum_{t=0}^{\infty} \gamma^t R(s_t, a_t, s_{t+1}) \mid s_0 = s, a_0 = a\right]$$
 
 The Bellman equations express these value functions recursively:
 
-$$
-V^\pi(s) = \sum_{a} \pi(a\lvert s) \sum_{s'} P(s' \mid s,a)[R(s,a,s') + \gamma V^\pi(s')]
-$$
+$$V^\pi(s) = \sum_{a} \pi(a\lvert s) \sum_{s'} P(s' \mid s,a)[R(s,a,s') + \gamma V^\pi(s')]$$
 
-$$
-Q^\pi(s,a) = \sum_{s'} P(s'\lvert s,a)[R(s,a,s') + \gamma \sum_{a'} \pi(a' \mid s') Q^\pi(s',a')]
-$$
+$$Q^\pi(s,a) = \sum_{s'} P(s'\lvert s,a)[R(s,a,s') + \gamma \sum_{a'} \pi(a' \mid s') Q^\pi(s',a')]$$
 
 The optimal Bellman equations define the optimal value functions:
 
-$$
-V^*(s) = \max_a \sum_{s'} P(s'\mid s,a)[R(s,a,s') + \gamma V^*(s')]
-$$
+$$V^*(s) = \max_a \sum_{s'} P(s'\mid s,a)[R(s,a,s') + \gamma V^*(s')]$$
 
-$$
-Q^*(s,a) = \sum_{s'} P(s'\mid s,a)[R(s,a,s') + \gamma \max_{a'} Q^*(s',a')]
-$$
+$$Q^*(s,a) = \sum_{s'} P(s'\mid s,a)[R(s,a,s') + \gamma \max_{a'} Q^*(s',a')]$$
 
 The optimal policy can be extracted from the optimal Q-function: $$\pi^*(s) = \arg\max_a Q^*(s,a)$$.
 
@@ -787,9 +775,7 @@ Value-based reinforcement learning methods learn to estimate the value of states
 
 Q-learning is a foundational value-based algorithm that learns the optimal action-value function $$ Q^*(s,a)$$ through temporal difference updates. The algorithm maintains Q-value estimates for each state-action pair and updates them based on observed transitions:
 
-$$
-Q(s,a) \leftarrow Q(s,a) + \alpha [r + \gamma \max_{a'} Q(s',a') - Q(s,a)]
-$$
+$$Q(s,a) \leftarrow Q(s,a) + \alpha [r + \gamma \max_{a'} Q(s',a') - Q(s,a)]$$
 
 where $$\alpha $$ is the learning rate, $$ r $$ is the observed reward, $$ s'$$ is the next state, and the term $$ r + \gamma \max_{a'} Q(s',a') - Q(s,a)$$ is the temporal difference error measuring the discrepancy between the current Q-value estimate and the Bellman target.
 
@@ -809,9 +795,7 @@ The DQN algorithm addresses several challenges that arise when combining Q-learn
 
 The DQN loss function is:
 
-$$
-\mathcal{L}(\theta) = \mathbb{E}_{(s,a,r,s') \sim \mathcal{D}}\left[(r + \gamma \max_{a'} Q(s',a';\theta^-) - Q(s,a;\theta))^2\right]
-$$
+$$\mathcal{L}(\theta) = \mathbb{E}_{(s,a,r,s') \sim \mathcal{D}}\left[(r + \gamma \max_{a'} Q(s',a';\theta^-) - Q(s,a;\theta))^2\right]$$
 
 where $$\mathcal{D}$$ is the replay buffer.
 
@@ -819,15 +803,11 @@ Several extensions to DQN improve performance and address specific challenges:
 
 **Double DQN** addresses overestimation bias by decoupling action selection from Q-value estimation. The online network selects the best action, while the target network evaluates it:
 
-$$
-y = r + \gamma Q(s', \arg\max_{a'} Q(s',a';\theta); \theta^-)
-$$
+$$y = r + \gamma Q(s', \arg\max_{a'} Q(s',a';\theta); \theta^-)$$
 
 **Dueling DQN** factors the Q-function into state value and action advantage:
 
-$$
-Q(s,a;\theta) = V(s;\theta_v) + A(s,a;\theta_a) - \frac{1}{\lvert \mathcal{A} \rvert}\sum_{a'} A(s,a';\theta_a)
-$$
+$$Q(s,a;\theta) = V(s;\theta_v) + A(s,a;\theta_a) - \frac{1}{\lvert \mathcal{A} \rvert}\sum_{a'} A(s,a';\theta_a)$$
 
 This architecture makes it easier to learn that many actions have similar values, which is common in healthcare where multiple reasonable treatment options may have comparable outcomes.
 
@@ -1358,9 +1338,7 @@ While value-based methods like Q-learning learn a value function and derive a po
 
 The foundational policy gradient algorithm is REINFORCE, which optimizes a parameterized policy $$\pi_\theta(a\mid s)$$ by ascending the gradient of the expected return. The policy gradient theorem provides an elegant expression for this gradient:
 
-$$
-\nabla_\theta J(\theta) = \mathbb{E}_{\pi_\theta}\left[\sum_{t=0}^{T} \nabla_\theta \log \pi_\theta(a_t\mid s_t) G_t\right]
-$$
+$$\nabla_\theta J(\theta) = \mathbb{E}_{\pi_\theta}\left[\sum_{t=0}^{T} \nabla_\theta \log \pi_\theta(a_t\mid s_t) G_t\right]$$
 
 where $$G_t = \sum_{k=t}^{T} \gamma^{k-t} r_k$$ is the discounted return from time $$t$$. This formula has an intuitive interpretation: it increases the probability of actions that led to high returns and decreases the probability of actions that led to low returns, with the magnitude of the update proportional to the return and the gradient of the log probability.
 
@@ -1372,9 +1350,7 @@ The REINFORCE algorithm follows a simple procedure:
 
 A practical improvement is to subtract a baseline $$ b(s_t)$$ from the returns to reduce variance:
 
-$$
-\nabla_\theta J(\theta) = \mathbb{E}_{\pi_\theta}\left[\sum_{t=0}^{T} \nabla_\theta \log \pi_\theta(a_t\mid s_t) (G_t - b(s_t))\right]
-$$
+$$\nabla_\theta J(\theta) = \mathbb{E}_{\pi_\theta}\left[\sum_{t=0}^{T} \nabla_\theta \log \pi_\theta(a_t\mid s_t) (G_t - b(s_t))\right]$$
 
 The baseline does not bias the gradient (since $$\mathbb{E}[b(s)] \nabla_\theta \log \pi_\theta(a\mid s) = 0$$) but can substantially reduce variance. A common choice is $$b(s_t) = V(s_t)$$, the value function estimate for state $$s_t$$.
 
@@ -1384,15 +1360,11 @@ Actor-critic methods combine value-based and policy-based approaches by maintain
 
 The advantage function $$ A(s,a) = Q(s,a) - V(s)$$ measures how much better action $$ a $$ is than the average action in state $$ s$$. Using the advantage as the baseline in REINFORCE yields the advantage actor-critic (A2C) gradient:
 
-$$
-\nabla_\theta J(\theta) = \mathbb{E}_{\pi_\theta}\left[\nabla_\theta \log \pi_\theta(a\mid s) A(s,a)\right]
-$$
+$$\nabla_\theta J(\theta) = \mathbb{E}_{\pi_\theta}\left[\nabla_\theta \log \pi_\theta(a\mid s) A(s,a)\right]$$
 
 In practice, we approximate the advantage using temporal difference learning:
 
-$$
-A(s_t,a_t) \approx r_t + \gamma V(s_{t+1}) - V(s_t)
-$$
+$$A(s_t,a_t) \approx r_t + \gamma V(s_{t+1}) - V(s_t)$$
 
 Actor-critic methods offer reduced variance compared to REINFORCE while maintaining the benefits of policy gradient methods including the ability to handle continuous actions and learn stochastic policies.
 
@@ -1402,9 +1374,7 @@ Proximal policy optimization (PPO) is a modern policy gradient method that has b
 
 PPO optimizes a clipped surrogate objective that constrains how much the policy can change in a single update:
 
-$$
-L^{CLIP}(\theta) = \mathbb{E}_t\left[\min(r_t(\theta)\hat{A}_t, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon)\hat{A}_t)\right]
-$$
+$$L^{CLIP}(\theta) = \mathbb{E}_t\left[\min(r_t(\theta)\hat{A}_t, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon)\hat{A}_t)\right]$$
 
 where $$r_t(\theta) = \frac{\pi_\theta(a_t\lvert s_t)}{\pi_{\theta_{old}}(a_t \mid s_t)}$$ is the probability ratio between the new and old policies, $$\hat{A}_t$$ is the advantage estimate, and $$\epsilon$$ is a hyperparameter (typically 0.1 or 0.2) controlling the clip range.
 
@@ -2004,15 +1974,11 @@ Moreover, observational healthcare data suffers from confounding: clinician trea
 
 The simplest OPE method is importance sampling, which reweights trajectories according to how likely they would have been under the target policy relative to the behavioral policy. For a trajectory $$\tau = (s_0, a_0, r_0, \ldots, s_T, a_T, r_T)$$, the importance weight is:
 
-$$
-w(\tau) = \prod_{t=0}^{T} \frac{\pi_e(a_t\lvert s_t)}{\pi_b(a_t \mid s_t)}
-$$
+$$w(\tau) = \prod_{t=0}^{T} \frac{\pi_e(a_t\lvert s_t)}{\pi_b(a_t \mid s_t)}$$
 
 The OPE estimate is then:
 
-$$
-\hat{V}^{\pi_e}_{IS} = \frac{1}{n}\sum_{i=1}^{n} w(\tau_i) G(\tau_i)
-$$
+$$\hat{V}^{\pi_e}_{IS} = \frac{1}{n}\sum_{i=1}^{n} w(\tau_i) G(\tau_i)$$
 
 where $$G(\tau_i) = \sum_t \gamma^t r_t$$ is the return of trajectory $$i$$.
 
@@ -2024,9 +1990,7 @@ For equity, importance sampling has concerning properties. If the behavioral pol
 
 Doubly robust (DR) estimation combines importance sampling with learned models to reduce variance while maintaining theoretical guarantees. The DR estimator is:
 
-$$
-\hat{V}^{\pi_e}_{DR} = \frac{1}{n}\sum_{i=1}^{n}\left[\frac{\pi_e(a_i\lvert s_i)}{\pi_b(a_i \mid s_i)}(G_i - \hat{Q}(s_i,a_i)) + \mathbb{E}_{a \sim \pi_e}[\hat{Q}(s_i,a)]\right]
-$$
+$$\hat{V}^{\pi_e}_{DR} = \frac{1}{n}\sum_{i=1}^{n}\left[\frac{\pi_e(a_i\lvert s_i)}{\pi_b(a_i \mid s_i)}(G_i - \hat{Q}(s_i,a_i)) + \mathbb{E}_{a \sim \pi_e}[\hat{Q}(s_i,a)]\right]$$
 
 where $$\hat{Q}(s,a)$$ is a learned estimate of the Q-function.
 
@@ -2038,15 +2002,11 @@ For healthcare applications, doubly robust estimation is attractive because it l
 
 Fitted Q-evaluation (FQE) is a model-based OPE method that learns to predict returns directly. Rather than using importance sampling, FQE fits a Q-function $$ Q_{\pi_e}(s,a)$$ specific to the target policy by iteratively solving:
 
-$$
-Q_{\pi_e}(s,a) = r + \gamma \mathbb{E}_{s' \sim P(\cdot\lvert s,a), a' \sim \pi_e(\cdot \mid s')}[Q_{\pi_e}(s',a')]
-$$
+$$Q_{\pi_e}(s,a) = r + \gamma \mathbb{E}_{s' \sim P(\cdot\lvert s,a), a' \sim \pi_e(\cdot \mid s')}[Q_{\pi_e}(s',a')]$$
 
 using the observational dataset. The policy value is then estimated as:
 
-$$
-\hat{V}^{\pi_e}_{FQE} = \frac{1}{n}\sum_{i=1}^{n} \mathbb{E}_{a \sim \pi_e}[Q_{\pi_e}(s_{i,0}, a)]
-$$
+$$\hat{V}^{\pi_e}_{FQE} = \frac{1}{n}\sum_{i=1}^{n} \mathbb{E}_{a \sim \pi_e}[Q_{\pi_e}(s_{i,0}, a)]$$
 
 FQE can have lower variance than importance sampling methods, especially when the behavioral and target policies differ substantially. However, it is fully model-based and therefore only as good as the Q-function approximation, which may be poor for state-action pairs rarely observed in the data.
 

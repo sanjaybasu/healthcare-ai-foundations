@@ -58,15 +58,11 @@ From an equity perspective, logistic regression offers both advantages and chall
 
 Logistic regression models the log-odds of a binary outcome as a linear function of features. For a patient with feature vector $$\mathbf{x} = (x_1, x_2, \ldots, x_p)$$, the model predicts:
 
-$$
-P(Y = 1 \mid \mathbf{x}) = \frac{1}{1 + \exp(-(\beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_p x_p))}
-$$
+$$P(Y = 1 \mid \mathbf{x}) = \frac{1}{1 + \exp(-(\beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_p x_p))}$$
 
 where $$\beta_0, \beta_1, \ldots, \beta_p$$ are learned coefficients. Equivalently, the log-odds or logit is:
 
-$$
-\log\left(\frac{P(Y=1\mid\mathbf{x})}{P(Y=0\mid\mathbf{x})}\right) = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_p x_p
-$$
+$$\log\left(\frac{P(Y=1\mid\mathbf{x})}{P(Y=0\mid\mathbf{x})}\right) = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_p x_p$$
 
 This formulation connects naturally to how clinicians reason about risk. Each coefficient $$\beta_j $$ represents the change in log-odds of the outcome for a one-unit increase in feature $$ x_j $$ holding all other features constant. When we exponentiate coefficients, we obtain odds ratios that clinicians use routinely to interpret associations between risk factors and outcomes.
 
@@ -1067,17 +1063,13 @@ A decision tree is constructed through recursive binary splitting of the feature
 
 **Gini impurity** measures the probability of misclassifying a randomly chosen element if it were randomly labeled according to the distribution of labels in the node. For a node with class proportions $$ p_1, p_2, \ldots, p_K$$, the Gini impurity is:
 
-$$
-\text{Gini} = 1 - \sum_{k=1}^K p_k^2 = \sum_{k=1}^K p_k(1 - p_k)
-$$
+$$\text{Gini} = 1 - \sum_{k=1}^K p_k^2 = \sum_{k=1}^K p_k(1 - p_k)$$
 
 The algorithm selects splits that maximize the reduction in weighted average Gini impurity across child nodes. This criterion favors splits that create pure nodes where most samples belong to a single class.
 
 **Entropy** or information gain measures the reduction in uncertainty about class labels. For a node with class proportions $$p_1, p_2, \ldots, p_K$$, the entropy is:
 
-$$
-\text{Entropy} = -\sum_{k=1}^K p_k \log_2(p_k)
-$$
+$$\text{Entropy} = -\sum_{k=1}^K p_k \log_2(p_k)$$
 
 Splits are chosen to maximize information gain, the difference between parent node entropy and weighted average child node entropy. Entropy and Gini impurity typically produce similar trees, though entropy is more computationally expensive due to the logarithm computation.
 
@@ -1833,9 +1825,7 @@ From an equity perspective, random forests offer important advantages but also n
 
 A random forest consists of $$T$$ decision trees, each trained on a bootstrap sample of the training data with random feature subsampling at each split. For prediction, the forest aggregates predictions across all trees, typically using majority voting for classification or averaging for probability estimates:
 
-$$
-\hat{p}(y=1 \lvert \mathbf{x}) = \frac{1}{T} \sum_{t=1}^T \hat{p}_t(y=1 \rvert \mathbf{x})
-$$
+$$\hat{p}(y=1 \lvert \mathbf{x}) = \frac{1}{T} \sum_{t=1}^T \hat{p}_t(y=1 \rvert \mathbf{x})$$
 
 where $$\hat{p}_t(y=1 \mid \mathbf{x})$$ is the predicted probability from tree $$t$$.
 
@@ -2191,9 +2181,7 @@ Gradient boosting represents a fundamentally different approach to ensemble lear
 
 The gradient boosting algorithm works by iteratively adding trees that predict the residuals or gradients of the current ensemble's predictions. For binary classification with log loss, we start with a simple baseline model (often just predicting the overall prevalence) and then repeatedly add trees that move predictions in the direction that most reduces the loss function. After training $$ M$$ trees, the final prediction is:
 
-$$
-f(\mathbf{x}) = f_0 + \eta \sum_{m=1}^M h_m(\mathbf{x})
-$$
+$$f(\mathbf{x}) = f_0 + \eta \sum_{m=1}^M h_m(\mathbf{x})$$
 
 where $$f_0 $$ is the initial prediction, each $$ h_m $$ is a tree, and $$\eta$$ is the learning rate that controls how much each tree contributes. A smaller learning rate requires more trees but often improves generalization.
 

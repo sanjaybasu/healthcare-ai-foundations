@@ -44,9 +44,7 @@ Federated learning involves training a shared model across multiple parties, whi
 
 The mathematical framework for federated learning formalizes this distributed training process. We have $$ K $$ clients, where client $$ k $$ possesses a local dataset $$ \mathcal{D}_k $$ containing $$ n_k $$ samples. The full dataset across all clients is $$ \mathcal{D} = \bigcup_{k=1}^{K} \mathcal{D}_k $$ with total size $$ n = \sum_{k=1}^{K} n_k $$. Our goal is to learn model parameters $$ \theta $$ that minimize the global objective function:
 
-$$
-\min_{\theta} F(\theta) = \sum_{k=1}^{K} \frac{n_k}{n} F_k(\theta)
-$$
+$$\min_{\theta} F(\theta) = \sum_{k=1}^{K} \frac{n_k}{n} F_k(\theta)$$
 
 where $$ F_k(\theta) = \frac{1}{n_k} \sum_{(x,y) \in \mathcal{D}_k} \ell(f(x; \theta), y) $$ is the local objective function for client $$ k $$, measuring average loss over that client's data. The global objective is the weighted average of local objectives, with weights proportional to local data sizes. This weighting ensures that clients with more data have proportionally more influence on the learned model, which is natural but has important equity implications we will examine later.
 
@@ -58,21 +56,15 @@ Federated averaging, proposed by McMahan et al. \citep{mcmahan2017communication}
 
 In each communication round $$ t $$, the server selects a subset of clients $$ \mathcal{S}_t \subseteq \{1, \ldots, K\} $$ to participate. For healthcare applications, this selection might be based on which hospitals are currently available and have computational resources to contribute to training. The server sends the current global model parameters $$ \theta_t $$ to all selected clients. Each selected client $$ k \in \mathcal{S}_t $$ then performs local training, starting from the global parameters $$ \theta_t $$ and running multiple steps of stochastic gradient descent on its local data:
 
-$$
-\theta_t^{k,0} = \theta_t
-$$
+$$\theta_t^{k,0} = \theta_t$$
 
-$$
-\theta_t^{k,i+1} = \theta_t^{k,i} - \eta \nabla F_k(\theta_t^{k,i}; B_k^i)
-$$
+$$\theta_t^{k,i+1} = \theta_t^{k,i} - \eta \nabla F_k(\theta_t^{k,i}; B_k^i)$$
 
 for $$ i = 0, \ldots, E-1 $$, where $$ \eta $$ is the learning rate, $$ E $$ is the number of local epochs, and $$ B_k^i $$ is a mini-batch sampled from client $$ k $$ 's local data at step $$ i $$. After completing $$ E $$ local epochs, each client computes its model update $$ \Delta_t^k = \theta_t^{k,E} - \theta_t $$ and sends this update to the server.
 
 The server aggregates the received updates using a weighted average to produce the new global model:
 
-$$
-\theta_{t+1} = \theta_t + \sum_{k \in \mathcal{S}_t} \frac{n_k}{\sum_{j \in \mathcal{S}_t} n_j} \Delta_t^k
-$$
+$$\theta_{t+1} = \theta_t + \sum_{k \in \mathcal{S}_t} \frac{n_k}{\sum_{j \in \mathcal{S}_t} n_j} \Delta_t^k$$
 
 This weighted aggregation ensures that clients with more data have proportionally more influence on the global model update. The process repeats for multiple communication rounds until convergence or a predetermined stopping criterion.
 
@@ -800,9 +792,7 @@ FedProx, proposed by Li et al. \citep{li2020federated}, addresses data heterogen
 
 The key insight of FedProx is that when local data distributions differ substantially from the global distribution, aggressive local training as in standard federated averaging can move local models in directions that hurt global model performance. By penalizing deviation from the global model, FedProx ensures that local updates remain conservative and focused on learning patterns that generalize beyond the local site's specific population characteristics. The modified local objective for client $$ k $$ becomes:
 
-$$
-\min_{\theta} F_k(\theta) + \frac{\mu}{2} \|\theta - \theta_t\|^2
-$$
+$$\min_{\theta} F_k(\theta) + \frac{\mu}{2} \|\theta - \theta_t\|^2$$
 
 where $$ \theta_t $$ is the current global model and $$ \mu \gt  0 $$ is a hyperparameter controlling the strength of the proximal term. Larger $$ \mu $$ values enforce tighter coupling to the global model, appropriate when data heterogeneity is severe, while smaller values allow more local adaptation when sites have relatively similar populations.
 
@@ -1062,9 +1052,7 @@ Privacy protection is essential for federated learning in healthcare, where even
 
 Differential privacy, introduced by Dwork et al. \citep{dwork2006calibrating, dwork2014algorithmic}, provides a formal definition of privacy that bounds how much information an algorithm can reveal about any individual in a dataset. An algorithm $$ \mathcal{M} $$ satisfies $$ (\epsilon, \delta) $$ -differential privacy if for all neighboring datasets $$ D $$ and $$ D' $$ differing in a single individual's record, and for all possible outputs $$ S $$:
 
-$$
-\mathbb{P}[\mathcal{M}(D) \in S] \leq e^{\epsilon} \mathbb{P}[\mathcal{M}(D') \in S] + \delta
-$$
+$$\mathbb{P}[\mathcal{M}(D) \in S] \leq e^{\epsilon} \mathbb{P}[\mathcal{M}(D') \in S] + \delta$$
 
 The privacy parameter $$ \epsilon $$ controls how much the presence or absence of any individual can affect the algorithm's output distribution, with smaller values providing stronger privacy but typically reducing utility. The parameter $$ \delta $$ represents the probability of privacy loss exceeding $$ \epsilon $$, typically set to be cryptographically small like $$ 10^{-5} $$ or $$ 10^{-6} $$ for datasets of realistic size.
 

@@ -767,9 +767,7 @@ When calibration assessment reveals miscalibration, several post-hoc correction 
 
 Platt scaling, also known as logistic calibration, fits a logistic regression model mapping predicted probabilities to true labels using the calibration set. The recalibrated probability is given by:
 
-$$
-p_{calibrated} = \frac{1}{1 + \exp(a \cdot \text{logit}(p) + b)}
-$$
+$$p_{calibrated} = \frac{1}{1 + \exp(a \cdot \text{logit}(p) + b)}$$
 
 where $$ p $$ is the original predicted probability and $$ a, b $$ are parameters fit to the calibration data. This method assumes miscalibration follows a specific parametric form that can be corrected through a sigmoid transformation. Platt scaling works well when calibration errors are monotonic and can be addressed through a global transformation, but it may fail to correct more complex non-monotonic calibration patterns.
 
@@ -779,9 +777,7 @@ However, isotonic regression's flexibility comes at the cost of requiring more c
 
 Temperature scaling represents a simplified variant of Platt scaling particularly popular for calibrating neural networks. The method learns a single scalar temperature parameter $$ T $$ that divides the logits (log-odds) before applying the softmax function:
 
-$$
-p_{calibrated} = \text{softmax}(z/T)
-$$
+$$p_{calibrated} = \text{softmax}(z/T)$$
 
 where $$ z $$ are the model's logits. Temperature scaling preserves the rank ordering of predictions and maintains the model's confidence ratios, only adjusting the overall confidence level. This simplicity makes temperature scaling extremely data-efficient, requiring minimal calibration data to fit a single parameter, but it cannot correct complex calibration patterns that vary across the probability range or between different classes in multi-class problems.
 
@@ -1193,15 +1189,11 @@ For binary classification, conformal prediction can construct prediction sets co
 
 We begin by formalizing the standard conformal prediction framework before extending it to address health equity considerations. Consider a calibration set of $$ n $$ examples $$ (X_i, Y_i) $$ for $$ i=1,...,n $$ and a model $$ \hat{f} $$ producing predictions $$ \hat{Y}_i = \hat{f}(X_i) $$. We define a non-conformity score $$ s(X_i, Y_i) $$ measuring how different the true outcome $$ Y_i $$ is from the prediction $$ \hat{Y}_i $$. For regression, a natural non-conformity score is the absolute residual:
 
-$$
-s(X_i, Y_i) = \lvert Y_i - \hat{Y}_i \rvert
-$$
+$$s(X_i, Y_i) = \lvert Y_i - \hat{Y}_i \rvert$$
 
 For a new test point $$ X_{n+1} $$ with unknown outcome $$ Y_{n+1} $$, we want to construct a prediction interval $$ C(X_{n+1}) $$ such that $$ P(Y_{n+1} \in C(X_{n+1})) \geq 1 - \alpha $$. The conformal prediction interval is defined as:
 
-$$
-C(X_{n+1}) = \{y : s(X_{n+1}, y) \leq q_{\alpha}\}
-$$
+$$C(X_{n+1}) = \{y : s(X_{n+1}, y) \leq q_{\alpha}\}$$
 
 where $$ q_{\alpha} $$ is the $$ (1-\alpha)(n+1)/n $$ quantile of the calibration non-conformity scores $$ \{s(X_i, Y_i)\}_{i=1}^n $$. This construction guarantees that the prediction interval contains the true outcome with probability at least $$ 1-\alpha $$ under the exchangeability assumption that $$ (X_1, Y_1), ..., (X_n, Y_n), (X_{n+1}, Y_{n+1}) $$ are exchangeable random variables.
 
@@ -1213,15 +1205,11 @@ For health equity applications, we often care about achieving valid coverage not
 
 Group-conditional conformal prediction addresses this limitation by constructing separate prediction sets for each demographic group, guaranteeing valid coverage within each group. Let $$ G \in \{1, ..., K\} $$ denote group membership. For each group $$ g $$, we compute group-specific quantiles $$ q_{\alpha,g} $$ from calibration examples in that group:
 
-$$
-q_{\alpha,g} = \text{Quantile}_{1-\alpha}\{s(X_i, Y_i) : G_i = g, i = 1,...,n\}
-$$
+$$q_{\alpha,g} = \text{Quantile}_{1-\alpha}\{s(X_i, Y_i) : G_i = g, i = 1,...,n\}$$
 
 For a new test point in group $$ g $$, we construct the prediction interval using the group-specific quantile:
 
-$$
-C_g(X_{n+1}) = \{y : s(X_{n+1}, y) \leq q_{\alpha,g}\}
-$$
+$$C_g(X_{n+1}) = \{y : s(X_{n+1}, y) \leq q_{\alpha,g}\}$$
 
 This approach guarantees valid coverage within each group under group-specific exchangeability, ensuring that patients in all demographic groups receive uncertainty quantification that achieves nominal coverage regardless of differential model performance across groups.
 
@@ -1670,15 +1658,11 @@ Bayesian approaches to machine learning provide a principled framework for reaso
 
 In the Bayesian framework, we specify a prior distribution $$ p(\theta) $$ over model parameters $$ \theta $$ encoding our initial beliefs before observing data. Upon observing training data $$ \mathcal{D} = \{(x_i, y_i)\}_{i=1}^n $$, we update this prior using Bayes' rule to obtain a posterior distribution:
 
-$$
-p(\theta \mid \mathcal{D}) = \frac{p(\mathcal{D} \mid \theta) p(\theta)}{p(\mathcal{D})}
-$$
+$$p(\theta \mid \mathcal{D}) = \frac{p(\mathcal{D} \mid \theta) p(\theta)}{p(\mathcal{D})}$$
 
 The posterior distribution represents our updated uncertainty about model parameters after observing the data. For predictions on a new point $$ x^* $$, we integrate over the posterior to obtain the predictive distribution:
 
-$$
-p(y^* \mid x^*, \mathcal{D}) = \int p(y^* \rvert x^*, \theta) p(\theta \mid \mathcal{D}) d\theta
-$$
+$$p(y^* \mid x^*, \mathcal{D}) = \int p(y^* \rvert x^*, \theta) p(\theta \mid \mathcal{D}) d\theta$$
 
 This predictive distribution captures both epistemic uncertainty through the posterior distribution over parameters and aleatoric uncertainty through the likelihood $$ p(y^* \mid x^*, \theta) $$ for each parameter setting. The width of the predictive distribution reflects our total uncertainty about the outcome, with wider distributions for predictions far from training data where epistemic uncertainty is high.
 
@@ -1692,13 +1676,9 @@ Monte Carlo (MC) dropout provides a computationally efficient approximation to B
 
 MC dropout instead keeps dropout active during test time, performing multiple forward passes with different random dropout masks and treating the resulting distribution of predictions as an approximation to the Bayesian predictive distribution. For a test input $$ x^* $$, we generate $$ T $$ stochastic predictions $$ \{\hat{y}_t^*\}_{t=1}^T $$ using different dropout masks, then compute mean and variance:
 
-$$
-\mu(x^*) = \frac{1}{T} \sum_{t=1}^T \hat{y}_t^*
-$$
+$$\mu(x^*) = \frac{1}{T} \sum_{t=1}^T \hat{y}_t^*$$
 
-$$
-\sigma^2(x^*) = \frac{1}{T} \sum_{t=1}^T (\hat{y}_t^* - \mu(x^*))^2
-$$
+$$\sigma^2(x^*) = \frac{1}{T} \sum_{t=1}^T (\hat{y}_t^* - \mu(x^*))^2$$
 
 The variance $$ \sigma^2(x^*) $$ provides an estimate of predictive uncertainty, with higher variance indicating greater uncertainty. This approach is computationally efficient because it requires only multiple forward passes through an existing trained network without any changes to the training procedure or network architecture beyond standard dropout.
 
@@ -2123,13 +2103,9 @@ Deep ensembles specifically refer to ensembles of deep neural networks trained f
 
 For a test input $$ x^* $$, we generate predictions $$ \{\hat{f}_m(x^*)\}_{m=1}^M $$ from $$ M $$ ensemble members, then compute:
 
-$$
-\mu(x^*) = \frac{1}{M} \sum_{m=1}^M \hat{f}_m(x^*)
-$$
+$$\mu(x^*) = \frac{1}{M} \sum_{m=1}^M \hat{f}_m(x^*)$$
 
-$$
-\sigma^2(x^*) = \frac{1}{M} \sum_{m=1}^M (\hat{f}_m(x^*) - \mu(x^*))^2
-$$
+$$\sigma^2(x^*) = \frac{1}{M} \sum_{m=1}^M (\hat{f}_m(x^*) - \mu(x^*))^2$$
 
 The ensemble mean $$ \mu(x^*) $$ typically provides better predictions than any individual model due to averaging over different model biases. The ensemble variance $$ \sigma^2(x^*) $$ provides an uncertainty estimate, with high variance when ensemble members disagree indicating high epistemic uncertainty about the prediction.
 

@@ -1626,9 +1626,7 @@ We now develop practical approaches for validation study design that account for
 
 Power calculations for fairness metrics depend on the specific metric, expected performance levels, and disparity magnitude we want to detect. For sensitivity differences between two groups, we can use standard two-proportion z-tests. The required sample size per group for detecting a difference $$\delta $$ in sensitivity with power $$ 1-\beta $$ at significance level $$\alpha$$ is approximately:
 
-$$
-n = \frac{(z_{1-\alpha/2} + z_{1-\beta})^2 (\bar{p}(1-\bar{p}))}{\delta^2}
-$$
+$$n = \frac{(z_{1-\alpha/2} + z_{1-\beta})^2 (\bar{p}(1-\bar{p}))}{\delta^2}$$
 
 where $$\bar{p}$$ is the average sensitivity across groups and $$ z $$ denotes standard normal quantiles. For AUC comparisons, power calculations are more complex but can be approximated using methods developed by DeLong and colleagues that account for AUC variance and correlation between curves estimated on the same test set.
 

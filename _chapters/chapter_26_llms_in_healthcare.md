@@ -46,23 +46,17 @@ For an input sequence of tokens $$x_1, \ldots, x_n $$, we first embed each token
 
 Self-attention transforms the input through learned query, key, and value projections. For input $$\mathbf{X}$$, we compute:
 
-$$
-\mathbf{Q} = \mathbf{X}\mathbf{W}^Q, \quad \mathbf{K} = \mathbf{X}\mathbf{W}^K, \quad \mathbf{V} = \mathbf{X}\mathbf{W}^V
-$$
+$$\mathbf{Q} = \mathbf{X}\mathbf{W}^Q, \quad \mathbf{K} = \mathbf{X}\mathbf{W}^K, \quad \mathbf{V} = \mathbf{X}\mathbf{W}^V$$
 
 where $$\mathbf{W}^Q, \mathbf{W}^K, \mathbf{W}^V \in \mathbb{R}^{d \times d_k}$$ are learned weight matrices. The attention mechanism computes compatibility scores between queries and keys, then uses these scores to weight the values:
 
-$$
-\text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}}\right)\mathbf{V}
-$$
+$$\text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}}\right)\mathbf{V}$$
 
 The scaling factor $$\sqrt{d_k}$$ prevents dot products from growing too large in magnitude, which would push the softmax into regions with extremely small gradients. The softmax operation over each row produces attention weights summing to one, determining how much each position attends to every other position.
 
 Multi-head attention runs $$ h$$ attention mechanisms in parallel with different learned projections, allowing the model to attend to different representation subspaces:
 
-$$
-\text{MultiHead}(\mathbf{X}) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)\mathbf{W}^O
-$$
+$$\text{MultiHead}(\mathbf{X}) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)\mathbf{W}^O$$
 
 where $$\text{head}_i = \text{Attention}(\mathbf{Q}_i, \mathbf{K}_i, \mathbf{V}_i)$$ and $$\mathbf{W}^O \in \mathbb{R}^{hd_k \times d}$$ projects the concatenated heads back to the model dimension.
 
@@ -70,9 +64,7 @@ where $$\text{head}_i = \text{Attention}(\mathbf{Q}_i, \mathbf{K}_i, \mathbf{V}_
 
 Large language models are trained using causal language modeling objectives that predict the next token given previous context. For a sequence $$ x_1, \ldots, x_n$$, the model learns to maximize the log-likelihood:
 
-$$
-\mathcal{L}(\theta) = \sum_{t=1}^{n} \log P_\theta(x_t \mid x_1, \ldots, x_{t-1})
-$$
+$$\mathcal{L}(\theta) = \sum_{t=1}^{n} \log P_\theta(x_t \mid x_1, \ldots, x_{t-1})$$
 
 This autoregressive factorization allows the model to learn rich language patterns without requiring labeled data. The causal mask ensures that position $$t $$ can only attend to positions $$ 1, \ldots, t $$, preventing information leakage from future tokens during training.
 
@@ -82,17 +74,13 @@ At inference time, we generate text by sampling from the model's predicted distr
 
 While pre-trained LLMs capture general language patterns, healthcare applications require domain adaptation. Fine-tuning adjusts model parameters using supervised learning on task-specific data. For a dataset $$\mathcal{D} = \{(x^{(i)}, y^{(i)})\}_{i=1}^N$$ of input-output pairs, we minimize:
 
-$$
-\mathcal{L}_{\text{fine-tune}}(\theta) = -\sum_{i=1}^{N} \log P_\theta(y^{(i)} \mid x^{(i)})
-$$
+$$\mathcal{L}_{\text{fine-tune}}(\theta) = -\sum_{i=1}^{N} \log P_\theta(y^{(i)} \mid x^{(i)})$$
 
 However, full fine-tuning requires updating all model parameters, which is computationally expensive for large models and risks catastrophic forgetting of pre-trained knowledge. Parameter-efficient fine-tuning methods address this by updating only a small subset of parameters while keeping most weights frozen.
 
 Low-Rank Adaptation (LoRA) injects trainable rank-decomposition matrices into attention layers (Hu et al., 2021). For a pre-trained weight matrix $$\mathbf{W}_0 \in \mathbb{R}^{d \times k}$$, LoRA adds an update $$\Delta \mathbf{W} = \mathbf{B}\mathbf{A}$$ where $$\mathbf{B} \in \mathbb{R}^{d \times r}$$ and $$\mathbf{A} \in \mathbb{R}^{r \times k}$$ with rank $$r \ll \min(d, k)$$. During forward passes, we compute:
 
-$$
-\mathbf{h} = \mathbf{W}_0 \mathbf{x} + \mathbf{B}\mathbf{A}\mathbf{x}
-$$
+$$\mathbf{h} = \mathbf{W}_0 \mathbf{x} + \mathbf{B}\mathbf{A}\mathbf{x}$$
 
 By training only $$\mathbf{A}$$ and $$\mathbf{B}$$, LoRA reduces trainable parameters by orders of magnitude while achieving comparable performance to full fine-tuning.
 

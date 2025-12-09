@@ -693,9 +693,7 @@ The theoretical foundation for SHAP values comes from Shapley values in cooperat
 
 Formally, for a model $$f $$ making prediction $$ f(x)$$ for instance $$ x $$ with features $$ x = (x_1, ..., x_p)$$, the SHAP value $$\phi_i $$ for feature $$ i$$ is defined as:
 
-$$
-\phi_i(f, x) = \sum_{S \subseteq F \setminus \{i\}} \frac{\lvert S \rvert!(\lvert F \rvert - \lvert S \rvert - 1)!}{\lvert F \rvert!} [f_x(S \cup \{i\}) - f_x(S)]
-$$
+$$\phi_i(f, x) = \sum_{S \subseteq F \setminus \{i\}} \frac{\lvert S \rvert!(\lvert F \rvert - \lvert S \rvert - 1)!}{\lvert F \rvert!} [f_x(S \cup \{i\}) - f_x(S)]$$
 
 where $$F $$ is the set of all features, $$ S $$ ranges over all subsets not containing feature $$ i $$, and $$ f_x(S)$$ represents the expected prediction when only features in $$ S $$ are known. The terms $$\lvert S \rvert!(\lvert F \rvert-\lvert S \rvert-1)!/\lvert F \rvert!$$ weight each subset according to how many orderings of features place feature $$ i $$ immediately after the features in $$ S $$. This ensures fair attribution that accounts for feature interactions and dependencies.
 

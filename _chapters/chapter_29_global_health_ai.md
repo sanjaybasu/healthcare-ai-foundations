@@ -56,9 +56,7 @@ These constraints require rethinking standard AI architectures. Models with hund
 
 The distillation loss combines the standard supervised loss with a term encouraging the student's predictions to match the teacher's probability distribution:
 
-$$
-\mathcal{L}_{distill} = \alpha \mathcal{L}_{CE}(y, f_{student}(x)) + (1-\alpha) \mathcal{L}_{KL}(f_{teacher}(x), f_{student}(x))
-$$
+$$\mathcal{L}_{distill} = \alpha \mathcal{L}_{CE}(y, f_{student}(x)) + (1-\alpha) \mathcal{L}_{KL}(f_{teacher}(x), f_{student}(x))$$
 
 where $$\mathcal{L}_{CE}$$ is cross-entropy loss between predictions and true labels, $$\mathcal{L}_{KL}$$ is Kullback-Leibler divergence between teacher and student prediction distributions, and $$\alpha$$ weights the relative importance of these objectives. The temperature parameter in the softmax function for both teacher and student is often increased during distillation to create softer probability distributions that convey more information about the teacher's uncertainty.
 
@@ -2777,9 +2775,7 @@ The standard federated learning protocol proceeds iteratively:
 
 The most common aggregation strategy is Federated Averaging (FedAvg), which weights each client's contribution by their dataset size:
 
-$$
-\theta^{(t+1)} = \theta^{(t)} + \sum_{k=1}^K \frac{n_k}{n} \Delta\theta_k
-$$
+$$\theta^{(t+1)} = \theta^{(t)} + \sum_{k=1}^K \frac{n_k}{n} \Delta\theta_k$$
 
 where $$n_k $$ is the number of samples at client $$ k $$ and $$ n = \sum_k n_k$$ is the total.
 

@@ -41,17 +41,13 @@ Population risk stratification aims to identify individuals at high risk for adv
 
 Consider a standard risk stratification model for identifying patients at high risk of hospitalization within the next year. Let $$Y_i \in \{0, 1\}$$ indicate whether patient $$ i $$ is hospitalized during the prediction window, and $$ X_i$$ be a feature vector containing demographics, diagnoses, medications, and prior utilization. A logistic regression model estimates:
 
-$$
-P(Y_i = 1 \mid X_i) = \sigma(\beta^T X_i)
-$$
+$$P(Y_i = 1 \mid X_i) = \sigma(\beta^T X_i)$$
 
 where $$\sigma(z) = 1/(1 + e^{-z})$$ is the sigmoid function. Patients are ranked by predicted risk $$\hat{p}_i = \sigma(\hat{\beta}^T X_i)$$ and those above some threshold $$\tau $$ are enrolled in care management programs. This formulation has two critical equity problems. First, patients with better documentation will have higher predicted risks simply because their health problems are more comprehensively recorded, not because their underlying health is worse. A patient seen regularly at a well-resourced academic medical center will accumulate more diagnosis codes than an equally sick patient receiving sporadic care at an under-resourced community clinic. Second, the outcome $$ Y_i$$ measures healthcare utilization rather than underlying health need - patients who lack insurance or transportation may be extremely sick but unable to access hospitalization.
 
 A more equitable formulation distinguishes underlying health status from healthcare access and documentation quality. We can decompose the observed outcome as:
 
-$$
-Y_i = H_i \cdot A_i
-$$
+$$Y_i = H_i \cdot A_i$$
 
 where $$H_i \in \{0, 1\}$$ indicates whether patient $$ i $$ has a health condition severe enough to warrant hospitalization, and $$ A_i \in \{0, 1\}$$ indicates whether they actually access hospitalization given their health status. In underserved populations, many patients have $$ H_i = 1 $$ but $$ A_i = 0 $$ due to barriers like lack of insurance, transportation, or proximity to hospitals. Standard risk models trained on $$ Y_i $$ systematically underestimate risk for patients with low $$ A_i $$, concentrating resources on those who already have good access.
 
@@ -68,9 +64,7 @@ This composite outcome better captures underlying health status because laborato
 
 The most robust approach incorporates social determinants and health equity indices directly into risk models, not as additional predictors but as explicit components of the outcome definition. We can define need-adjusted risk as:
 
-$$
-R_i^{\text{need}} = P(H_i = 1 \mid X_i) \cdot V_i
-$$
+$$R_i^{\text{need}} = P(H_i = 1 \mid X_i) \cdot V_i$$
 
 where $$V_i $$ is a vulnerability index capturing social determinants that amplify the impact of health problems. For example, an elderly patient with diabetes living alone in a housing-unstable situation faces greater consequences from uncontrolled diabetes than an otherwise identical patient with strong family support and stable housing. The vulnerability index $$ V_i $$ can incorporate:
 
@@ -107,15 +101,11 @@ A more complete framework incorporates screening burden explicitly into the util
 
 Expected utility of screening at threshold $$\tau$$ for an individual is:
 
-$$
-EU(\tau) = p \cdot [\text{Se}(\tau) \cdot U_{TP} + (1-\text{Se}(\tau)) \cdot U_{FN}] + (1-p) \cdot [\text{Sp}(\tau) \cdot U_{TN} + (1-\text{Sp}(\tau)) \cdot U_{FP}]
-$$
+$$EU(\tau) = p \cdot [\text{Se}(\tau) \cdot U_{TP} + (1-\text{Se}(\tau)) \cdot U_{FN}] + (1-p) \cdot [\text{Sp}(\tau) \cdot U_{TN} + (1-\text{Sp}(\tau)) \cdot U_{FP}]$$
 
 The optimal threshold $$\tau^*$$ maximizes expected utility:
 
-$$
-\tau^* = \arg\max_\tau EU(\tau)
-$$
+$$\tau^* = \arg\max_\tau EU(\tau)$$
 
 Critically, the utility values $$U_{TP}, U_{TN}, U_{FP}, U_{FN}$$ vary across populations based on screening burden, access to follow-up care, and treatment effectiveness. For populations facing high screening burden, $$ U_{FP}$$ is more negative (false positives cause greater harm) and $$ U_{TN}$$ is less positive (screening itself imposes costs even when negative). This means the optimal threshold $$\tau^*$$ should differ across populations - higher thresholds (requiring stronger evidence before screening positive) for populations with high screening burden.
 
@@ -123,31 +113,23 @@ Standard practice uses uniform thresholds across populations, which systematical
 
 An equitable screening strategy optimizes thresholds separately for populations with different burden profiles:
 
-$$
-\tau_g^* = \arg\max_\tau EU_g(\tau)
-$$
+$$\tau_g^* = \arg\max_\tau EU_g(\tau)$$
 
 where subscript $$g$$ indicates population group. This approach raises concerns about "different standards" for different groups, but the key insight is that groups already face different burdens - uniform thresholds mean uniform test characteristics but inequitable net benefit. Adjusting thresholds to equalize net benefit across groups is more equitable than maintaining uniform test characteristics.
 
 The number needed to screen (NNS) provides an interpretable metric for comparing screening strategies:
 
-$$
-\text{NNS} = \frac{1}{p \cdot \text{Se}(\tau) \cdot \text{RRR}}
-$$
+$$\text{NNS} = \frac{1}{p \cdot \text{Se}(\tau) \cdot \text{RRR}}$$
 
 where RRR is relative risk reduction from detecting and treating disease early. Lower NNS means fewer people need to be screened to prevent one adverse outcome. However, NNS alone is insufficient for equity analysis because it doesn't account for screening burden or differential treatment effectiveness. A better metric is number needed to screen to achieve net benefit:
 
-$$
-\text{NNS}_{\text{net}} = \frac{1}{p \cdot \text{Se}(\tau) \cdot \text{RRR} - (1-p) \cdot (1-\text{Sp}(\tau)) \cdot h}
-$$
+$$\text{NNS}_{\text{net}} = \frac{1}{p \cdot \text{Se}(\tau) \cdot \text{RRR} - (1-p) \cdot (1-\text{Sp}(\tau)) \cdot h}$$
 
 where $$h $$ is the ratio of harms from false positive to benefits from true positive. This metric accounts for false positive harms and provides a more complete picture of screening value.
 
 Screening optimization must also address differential participation rates. Even if a screening strategy has positive net benefit at the population level, it exacerbates disparities if participation is lower among those who would benefit most. Let $$\pi_g $$ be the participation rate in group $$ g$$. Population-level impact of screening is:
 
-$$
-\text{Impact}_g = \pi_g \cdot [p_g \cdot \text{Se}(\tau) \cdot \text{RRR}]
-$$
+$$\text{Impact}_g = \pi_g \cdot [p_g \cdot \text{Se}(\tau) \cdot \text{RRR}]$$
 
 If participation rates $$\pi_g $$ are lower in groups with higher prevalence $$ p_g $$ (as often occurs in underserved populations), screening widens disparities even if it has positive benefit in participating individuals. This requires intervention strategies that actively reduce participation barriers rather than simply offering screening and assuming equal uptake.
 
@@ -157,17 +139,13 @@ Outbreak detection systems identify unusual increases in disease incidence to tr
 
 The fundamental problem in outbreak detection is distinguishing signal (true outbreak) from noise (random variation in baseline disease rates). Let $$ Y_t $$ be the count of disease cases observed at time $$ t $$. Under the null hypothesis of no outbreak, $$ Y_t $$ follows some baseline distribution, while under the alternative hypothesis of an outbreak starting at time $$\tau_0$$, there is an elevated rate:
 
-$$
-Y_t \sim \begin{cases} \text{Baseline}(\lambda_0) & t < \tau_0 \\ \text{Outbreak}(\lambda_1) & t \geq \tau_0 \end{cases}
-$$
+$$Y_t \sim \begin{cases} \text{Baseline}(\lambda_0) & t < \tau_0 \\ \text{Outbreak}(\lambda_1) & t \geq \tau_0 \end{cases}$$
 
 where $$\lambda_1 \gt  \lambda_0 $$. The goal is to detect the change point $$\tau_0$$ as quickly as possible while maintaining low false alarm rates.
 
 The cumulative sum (CUSUM) control chart is a classical sequential detection method that accumulates evidence of deviation from baseline. Define the CUSUM statistic:
 
-$$
-S_t = \max(0, S_{t-1} + (Y_t - \mu_0 - k))
-$$
+$$S_t = \max(0, S_{t-1} + (Y_t - \mu_0 - k))$$
 
 where $$\mu_0 $$ is the expected count under baseline, and $$ k $$ is a reference value (typically set to half the minimum outbreak effect size). An alarm is raised when $$ S_t $$ exceeds threshold $$ h $$. The CUSUM efficiently detects sustained increases in disease counts and provides control over average run length (ARL), the expected time to false alarm under the null hypothesis.
 
@@ -175,33 +153,25 @@ However, CUSUM assumes complete and uniform surveillance. In reality, disease re
 
 An equity-aware CUSUM approach standardizes by population-specific baselines and adjusts for reporting rates. Let $$\rho_g $$ be the estimated reporting rate (proportion of true cases that are captured by surveillance) in geographic area $$ g$$. We can adjust the CUSUM statistic to:
 
-$$
-S_t^g = \max(0, S_{t-1}^g + \frac{Y_t^g - \mu_0^g}{\rho_g} - k)
-$$
+$$S_t^g = \max(0, S_{t-1}^g + \frac{Y_t^g - \mu_0^g}{\rho_g} - k)$$
 
 This formulation upweights observations from areas with poor surveillance coverage, making the system more sensitive to changes in these communities. However, this also increases false alarm rates in low-coverage areas if reporting variability is higher, requiring careful calibration.
 
 An alternative approach employs stratified thresholds that explicitly trade off detection speed against false alarm rates differently across communities. We can set community-specific thresholds $$h_g$$ to equalize expected time to detection for outbreaks of equal severity:
 
-$$
-\mathbb{E}[\tau^g \mid \text{outbreak}] = c \text{ for all } g
-$$
+$$\mathbb{E}[\tau^g \mid \text{outbreak}] = c \text{ for all } g$$
 
 where $$\tau^g $$ is the detection time in community $$ g $$ and $$ c $$ is a constant. This means accepting higher false alarm rates in underserved communities with poorer surveillance in exchange for comparable detection speed, which may be justified by the greater consequences of delayed outbreak response in these vulnerable populations.
 
 Spatial scan statistics provide complementary approaches that detect geographic clusters of disease. The Kulldorff spatial scan statistic evaluates cylinders (circles on a map extended through time) and identifies clusters where observed case counts significantly exceed expected counts. For each potential cluster $$ Z$$, the likelihood ratio is:
 
-$$
-\Lambda(Z) = \left(\frac{c_Z}{E[c_Z]}\right)^{c_Z} \left(\frac{c_{\bar{Z}}}{E[c_{\bar{Z}}]}\right)^{c_{\bar{Z}}}
-$$
+$$\Lambda(Z) = \left(\frac{c_Z}{E[c_Z]}\right)^{c_Z} \left(\frac{c_{\bar{Z}}}{E[c_{\bar{Z}}]}\right)^{c_{\bar{Z}}}$$
 
 where $$c_Z $$ is observed cases in cluster $$ Z $$, $$ c_{\bar{Z}}$$ is observed cases outside the cluster, and $$ E[\cdot]$$ indicates expected counts. The most likely cluster is the one maximizing $$\Lambda(Z)$$, and statistical significance is assessed via Monte Carlo simulation.
 
 Spatial scan statistics have equity implications because they naturally detect clusters in areas with higher population density and better surveillance coverage. A cluster of 100 excess cases in a dense urban area with good healthcare access is more likely to be detected than a cluster of 50 excess cases in a rural area with limited healthcare facilities, even though the rural outbreak may represent a larger relative increase in disease burden. To address this, we can use population-adjusted scan statistics that weight by population size and vulnerability indices:
 
-$$
-\Lambda^{\text{adj}}(Z) = V_Z \cdot \Lambda(Z)
-$$
+$$\Lambda^{\text{adj}}(Z) = V_Z \cdot \Lambda(Z)$$
 
 where $$V_Z $$ is an average vulnerability index for cluster $$ Z $$. This upweights clusters in vulnerable communities, increasing sensitivity to outbreaks in areas where consequences are most severe.
 
@@ -211,45 +181,33 @@ Resource allocation in population health determines which communities receive li
 
 Consider a resource allocation problem where we have $$ R $$ units of a resource (e.g., community health workers) to allocate across $$ G $$ geographic areas. Let $$ r_g $$ be the allocation to area $$ g $$, subject to $$\sum_g r_g = R$$. An efficiency-based allocation maximizes total impact:
 
-$$
-\max_{r_g} \sum_g I_g(r_g)
-$$
+$$\max_{r_g} \sum_g I_g(r_g)$$
 
 where $$I_g(r_g)$$ is the predicted impact (e.g., number of hospitalizations prevented) in area $$ g $$ from allocating $$ r_g $$ resources. This formulation naturally concentrates resources in areas where infrastructure already exists to support effective interventions, as $$ I_g(r_g)$$ is higher in well-resourced communities.
 
 An equity-based allocation instead maximizes weighted impact where weights reflect need rather than capacity:
 
-$$
-\max_{r_g} \sum_g w_g \cdot I_g(r_g)
-$$
+$$\max_{r_g} \sum_g w_g \cdot I_g(r_g)$$
 
 subject to constraints that ensure adequate coverage in all communities:
 
-$$
-r_g \geq r_{\min} \text{ for all } g
-$$
+$$r_g \geq r_{\min} \text{ for all } g$$
 
 The weights $$w_g$$ can incorporate multiple dimensions of need:
 
-$$
-w_g = \alpha_1 \cdot \text{Disease burden}_g + \alpha_2 \cdot \text{Vulnerability}_g + \alpha_3 \cdot \text{Resource deficit}_g
-$$
+$$w_g = \alpha_1 \cdot \text{Disease burden}_g + \alpha_2 \cdot \text{Vulnerability}_g + \alpha_3 \cdot \text{Resource deficit}_g$$
 
 where disease burden captures baseline prevalence and severity, vulnerability incorporates social determinants and healthcare access barriers, and resource deficit measures existing resource gaps relative to need. The coefficients $$\alpha_1, \alpha_2, \alpha_3$$ reflect value judgments about how to prioritize different dimensions of need.
 
 An alternative formulation optimizes for equity directly by minimizing disparities in outcomes across areas:
 
-$$
-\min_{r_g} \text{Var}_g[H_g(r_g)]
-$$
+$$\min_{r_g} \text{Var}_g[H_g(r_g)]$$
 
 where $$H_g(r_g)$$ is the predicted health outcome (e.g., life expectancy, disease-free years) in area $$ g $$ given resource allocation $$ r_g $$. This minimax approach seeks to raise the floor, prioritizing improvements in worst-off communities over aggregate benefit.
 
 Capacity planning for healthcare services must account for geographic access barriers that affect underserved populations disproportionately. The classic facility location problem determines where to place $$ K $$ facilities to minimize average travel distance. Let $$ d_{ig}$$ be the distance from individual $$ i $$ to potential facility location $$ g $$, and $$ y_g \in \{0, 1\}$$ indicate whether a facility is placed at location $$ g$$. The p-median problem minimizes total travel burden:
 
-$$
-\min_{y_g, x_{ig}} \sum_i \sum_g d_{ig} \cdot x_{ig}
-$$
+$$\min_{y_g, x_{ig}} \sum_i \sum_g d_{ig} \cdot x_{ig}$$
 
 subject to:
 - $$\sum_g y_g = K$$ (exactly $$K$$ facilities)
@@ -260,17 +218,13 @@ This formulation minimizes average travel distance but ignores heterogeneity in 
 
 An equity-focused facility location approach weights travel burden by individual vulnerability:
 
-$$
-\min_{y_g, x_{ig}} \sum_i v_i \cdot \sum_g d_{ig} \cdot x_{ig}
-$$
+$$\min_{y_g, x_{ig}} \sum_i v_i \cdot \sum_g d_{ig} \cdot x_{ig}$$
 
 where $$v_i $$ is a vulnerability score capturing factors that amplify travel burden (lack of car, caregiving responsibilities, job inflexibility, etc.). This formulation places facilities closer to those for whom access barriers are most significant, even if it increases average travel distance.
 
 Capacity planning must also consider temporal variation in demand and resource availability. Underserved communities often face "deserts" of healthcare access during evenings and weekends when family members are available to accompany patients to appointments. Queueing models can inform capacity planning decisions that account for these patterns. The M/M/s queue with time-varying arrival rates $$\lambda(t)$$ and $$ s$$ servers provides a baseline model. Expected waiting time is:
 
-$$
-W = \frac{P_0}{s \mu - \lambda(t)} \cdot \frac{(\lambda(t) / \mu)^s}{s! \cdot (1 - \lambda(t)/(s\mu))^2}
-$$
+$$W = \frac{P_0}{s \mu - \lambda(t)} \cdot \frac{(\lambda(t) / \mu)^s}{s! \cdot (1 - \lambda(t)/(s\mu))^2}$$
 
 where $$\mu $$ is service rate and $$ P_0$$ is the probability of zero customers in system. For populations with limited flexibility in timing, prolonged wait times effectively reduce access.
 
