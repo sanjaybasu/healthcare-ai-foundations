@@ -566,7 +566,10 @@ class ChapterUpdater:
         Args:
             anthropic_api_key: Anthropic API key
         """
-        self.client = anthropic.Anthropic(api_key=anthropic_api_key)
+        self.client = anthropic.Anthropic(
+            api_key=anthropic_api_key.strip() if anthropic_api_key else anthropic_api_key
+        )
+        self.model = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5-5")
         
     def assess_relevance(
         self,
@@ -612,14 +615,20 @@ Respond with a JSON object:
 """
         
         try:
-            response = self.client.messages.create(
-                model="claude-sonnet-4-20250514",
-                max_tokens=1000,
-                messages=[{"role": "user", "content": prompt}]
-            )
+            create_kwargs = {
+                "model": self.model,
+                "max_tokens": 2048,
+                "messages": [{"role": "user", "content": prompt}],
+            }
+            if self.model.startswith("claude-sonnet-5-5"):
+                create_kwargs["thinking"] = {"type": "between_tools"}
+                create_kwargs["output_config"] = {"effort": "low"}
+            response = self.client.messages.create(**create_kwargs)
             
             # Parse response
-            text = response.content[0].text
+            text = "".join(
+                b.text for b in response.content if getattr(b, "type", "") == "text"
+            )
             # Extract JSON from response
             import re
             json_match = re.search(r'\{[^{}]*\}', text, re.DOTALL)

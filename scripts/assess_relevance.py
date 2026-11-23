@@ -322,12 +322,12 @@ class UltraSelectiveRelevanceAssessor:
             impact_threshold: Minimum impact score (0-100) for consideration
             min_citations: Minimum citations for non-tier1 journals
         """
-        self.api_key = api_key or os.getenv('ANTHROPIC_API_KEY')
+        self.api_key = (api_key or os.getenv('ANTHROPIC_API_KEY') or '').strip()
         if not self.api_key:
             raise ValueError("Anthropic API key required")
         
         self.client = Anthropic(api_key=self.api_key)
-        self.model = "claude-sonnet-4-20250514"
+        self.model = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5-5")
         self.base_delay = base_delay
         self.max_retries = max_retries
         
@@ -473,13 +473,19 @@ Remember: Default to REJECTION unless this is truly a groundbreaking paper that 
                     time.sleep(self.base_delay)
                 
                 self.api_calls += 1
-                response = self.client.messages.create(
-                    model=self.model,
-                    max_tokens=1000,
-                    messages=[{"role": "user", "content": prompt}]
-                )
+                create_kwargs = {
+                    "model": self.model,
+                    "max_tokens": 2048,
+                    "messages": [{"role": "user", "content": prompt}],
+                }
+                if self.model.startswith("claude-sonnet-5-5"):
+                    create_kwargs["thinking"] = {"type": "between_tools"}
+                    create_kwargs["output_config"] = {"effort": "low"}
+                response = self.client.messages.create(**create_kwargs)
                 
-                response_text = response.content[0].text.strip()
+                response_text = "".join(
+                    b.text for b in response.content if getattr(b, "type", "") == "text"
+                ).strip()
                 
                 # Remove markdown code blocks
                 if response_text.startswith('```'):
@@ -506,7 +512,10 @@ Remember: Default to REJECTION unless this is truly a groundbreaking paper that 
                 if isinstance(e, RateLimitError):
                     self.rate_limit_hits += 1
                 self.api_errors += 1
-                logger.warning(f"API error (attempt {attempt + 1}/{self.max_retries}): {e}")
+                logger.warning(
+                    f"API error (attempt {attempt + 1}/{self.max_retries}): "
+                    f"{type(e).__name__}: {e} (cause={e.__cause__!r})"
+                )
                 if attempt == self.max_retries - 1:
                     return None
             except json.JSONDecodeError as e:

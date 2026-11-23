@@ -34,8 +34,8 @@ class PaperAnalyzer:
         Args:
             api_key: Anthropic API key
         """
-        self.client = anthropic.Anthropic(api_key=api_key)
-        self.model = "claude-sonnet-4-20250514"
+        self.client = anthropic.Anthropic(api_key=api_key.strip() if api_key else api_key)
+        self.model = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5-5")
     
     def analyze_paper_relevance(
         self,
@@ -90,16 +90,20 @@ Evaluate this paper's relevance and provide a structured analysis. Return your r
 Respond ONLY with valid JSON, no other text."""
 
         try:
-            message = self.client.messages.create(
-                model=self.model,
-                max_tokens=2000,
-                messages=[
-                    {"role": "user", "content": prompt}
-                ]
-            )
+            create_kwargs = {
+                "model": self.model,
+                "max_tokens": 2048,
+                "messages": [{"role": "user", "content": prompt}],
+            }
+            if self.model.startswith("claude-sonnet-5-5"):
+                create_kwargs["thinking"] = {"type": "between_tools"}
+                create_kwargs["output_config"] = {"effort": "low"}
+            message = self.client.messages.create(**create_kwargs)
             
             # Extract JSON from response
-            response_text = message.content[0].text.strip()
+            response_text = "".join(
+                b.text for b in message.content if getattr(b, "type", "") == "text"
+            ).strip()
             
             # Remove markdown code blocks if present
             if response_text.startswith("```json"):

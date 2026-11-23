@@ -34,8 +34,8 @@ class ChapterUpdater:
         Args:
             api_key: Anthropic API key
         """
-        self.client = anthropic.Anthropic(api_key=api_key)
-        self.model = "claude-sonnet-4-20250514"
+        self.client = anthropic.Anthropic(api_key=api_key.strip() if api_key else api_key)
+        self.model = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5-5")
     
     def generate_update_suggestions(
         self,
@@ -122,15 +122,19 @@ Prioritize:
 Respond ONLY with valid JSON."""
 
         try:
-            message = self.client.messages.create(
-                model=self.model,
-                max_tokens=4000,
-                messages=[
-                    {"role": "user", "content": prompt}
-                ]
-            )
+            create_kwargs = {
+                "model": self.model,
+                "max_tokens": 4096,
+                "messages": [{"role": "user", "content": prompt}],
+            }
+            if self.model.startswith("claude-sonnet-5-5"):
+                create_kwargs["thinking"] = {"type": "between_tools"}
+                create_kwargs["output_config"] = {"effort": "low"}
+            message = self.client.messages.create(**create_kwargs)
             
-            response_text = message.content[0].text.strip()
+            response_text = "".join(
+                b.text for b in message.content if getattr(b, "type", "") == "text"
+            ).strip()
             
             # Clean up response
             if response_text.startswith("```json"):
